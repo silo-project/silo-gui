@@ -1,13 +1,24 @@
 #include <iostream>
-
+#include <SFML/Network.hpp>
 #include "corecomm.hpp"
 
-using namespace std;
+using namespace sf;
+
+namespace CoreComm {
+	TcpSocket socket;
+	int connect() {
+		Socket::Status status = socket.connect(COMM_ADDR, COMM_PORT);
+		if (status != Socket::Done)
+		{
+			// error...
+		}
+	}
+}
 
 
+/*
 #ifdef _WIN32
 #include <WinSock2.h>
-
 namespace CoreComm {
 
 	SOCKET sock;
@@ -86,3 +97,4 @@ namespace CoreComm {
 	}
 }
 #endif
+*/
