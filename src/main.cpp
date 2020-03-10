@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
+#include "file/circreader.hpp"
 
 int main(int argc, char** argv) {
+	CircReader::read("../Test.circ");
     sf::RenderWindow window(sf::VideoMode(1280, 720), "SILO");
 
     while(window.isOpen()) {
