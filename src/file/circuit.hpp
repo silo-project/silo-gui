@@ -1,22 +1,23 @@
 #ifndef __CIRCUIT_H__
 #define __CIRCUIT_H__
 
-namespace Circuit {
-	enum Side {
-		north, south, east, west
-	};
-}
+#include <string>
 
 class Circuit {
+public: enum Side { north = 1, south, east, west };
 protected:
-	std::string name;
-	std::string label;
-	Circuit::side labelup;
+	std::string* name;
+	std::string* label;
+	Side labelup;
+	std::string* labelfont;
 
 public:
-	std::string getName();
+	const char* getName();
+	const char* getLabel();
+	Side getLabelUp();
+	const char* getLabelFont();
 
-	Circuit();
+	Circuit(const char*, const char*, Side, const char*);
 	~Circuit();
 };
 
