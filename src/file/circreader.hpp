@@ -1,5 +1,5 @@
-#ifndef __CIRCREADER_H__
-#define __CIRCREADER_H__
+#ifndef CIRCREADER_H
+#define CIRCREADER_H
 
 #include "circuit.hpp"
 

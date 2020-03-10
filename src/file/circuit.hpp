@@ -1,5 +1,5 @@
-#ifndef __CIRCUIT_H__
-#define __CIRCUIT_H__
+#ifndef CIRCUIT_H
+#define CIRCUIT_H
 
 #include <string>
 

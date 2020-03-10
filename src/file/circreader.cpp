@@ -19,7 +19,6 @@ namespace CircReader {
 		int circcount = 0;
 		for (XMLElement* circuit = project->FirstChildElement("circuit"); circuit; circuit = circuit->NextSiblingElement("circuit")) {
 			circuitSet->insert(readCirc(circuit));
-			cout << "b" << endl;
 			circcount++;
 		}
 		return circcount;

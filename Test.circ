@@ -62,15 +62,21 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
     <wire from="(360,430)" to="(380,430)"/>
     <wire from="(380,420)" to="(400,420)"/>
     <wire from="(380,420)" to="(380,430)"/>
+    <comp lib="5" loc="(450,440)" name="LED">
+      <a name="label" val="A LED"/>
+    </comp>
+    <comp lib="4" loc="(460,680)" name="ROM">
+      <a name="contents">addr/data: 8 8
+0
+</a>
+    </comp>
     <comp lib="5" loc="(360,430)" name="Button">
       <a name="label" val="A Button"/>
     </comp>
     <comp lib="1" loc="(450,440)" name="AND Gate">
       <a name="inputs" val="2"/>
     </comp>
-    <comp lib="5" loc="(450,440)" name="LED">
-      <a name="label" val="A LED"/>
-    </comp>
+    <comp lib="4" loc="(460,570)" name="RAM"/>
   </circuit>
   <circuit name="not_main">
     <a name="circuit" val="not_main"/>
