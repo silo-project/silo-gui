@@ -65,11 +65,7 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
     <comp lib="5" loc="(450,440)" name="LED">
       <a name="label" val="A LED"/>
     </comp>
-    <comp lib="4" loc="(460,680)" name="ROM">
-      <a name="contents">addr/data: 8 8
-0
-</a>
-    </comp>
+    <comp loc="(430,370)" name="AND Gate"/>
     <comp lib="5" loc="(360,430)" name="Button">
       <a name="label" val="A Button"/>
     </comp>
@@ -77,11 +73,34 @@ This file is intended to be loaded by Logisim (http://www.cburch.com/logisim/).
       <a name="inputs" val="2"/>
     </comp>
     <comp lib="4" loc="(460,570)" name="RAM"/>
+    <comp lib="4" loc="(460,680)" name="ROM">
+      <a name="contents">addr/data: 8 8
+0
+</a>
+    </comp>
   </circuit>
-  <circuit name="not_main">
-    <a name="circuit" val="not_main"/>
+  <circuit name="AND Gate">
+    <a name="circuit" val="AND Gate"/>
     <a name="clabel" val=""/>
     <a name="clabelup" val="east"/>
     <a name="clabelfont" val="SansSerif plain 12"/>
+    <appear>
+      <path d="M61,51 Q65,61 69,51" fill="none" stroke="#808080" stroke-width="2"/>
+      <rect fill="none" height="30" stroke="#000000" stroke-width="2" width="30" x="50" y="50"/>
+      <circ-port height="8" pin="510,480" width="8" x="46" y="56"/>
+      <circ-port height="8" pin="510,500" width="8" x="46" y="66"/>
+      <circ-port height="10" pin="540,490" width="10" x="75" y="65"/>
+      <circ-anchor facing="east" height="6" width="6" x="77" y="57"/>
+    </appear>
+    <comp lib="0" loc="(540,490)" name="Pin">
+      <a name="facing" val="west"/>
+      <a name="output" val="true"/>
+    </comp>
+    <comp lib="1" loc="(540,490)" name="AND Gate">
+      <a name="size" val="30"/>
+      <a name="inputs" val="2"/>
+    </comp>
+    <comp lib="0" loc="(510,500)" name="Pin"/>
+    <comp lib="0" loc="(510,480)" name="Pin"/>
   </circuit>
 </project>
