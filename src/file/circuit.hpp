@@ -2,8 +2,14 @@
 #define CIRCUIT_H
 
 #include <string>
-#include <vector>
+#include <map>
+#include <set>
 #include "part.hpp"
+namespace _CircuitCmp {
+	struct cmp {
+		bool operator() (Part*, Part*) const;
+	};
+}
 
 class Circuit {
 public: enum Side { north = 1, south, east, west };
@@ -19,9 +25,12 @@ public:
 	Side getLabelUp();
 	const char* getLabelFont();
 
+	std::multimap<Position, Position> forward;
+	std::multimap<Position, Position> reverse;
+
 	Circuit(const char*, const char*, Side, const char*);
 	~Circuit();
-	std::vector<Part*> partVect;
+	std::set<Part*, _CircuitCmp::cmp> partSet;
 };
 
 #endif

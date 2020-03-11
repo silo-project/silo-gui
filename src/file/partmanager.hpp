@@ -6,13 +6,13 @@
 #include <cstdint>
 #include "part.hpp"
 
-namespace PartManager {
+class PartManager {
+public:
 	int init();
-	int addPart(const char*, uint32_t, const char*);
-	int addPart(const char*, uint32_t, uint32_t, const char*);
+	int regPart(const char*, uint32_t, const char*);
 	_PartID findPartID(const char*);
-	extern std::map<std::string, _PartID> partIDMap;
-	extern std::map<_PartID, std::string> partSVGMap;
+protected:
+	extern std::map<std::string, uint32_t> partIDMap;
 }
 
 #endif

@@ -1,7 +1,7 @@
 #include "file\circuit.hpp"
 #include "Value.hpp"
 
-class ConductNode{
+class ConductNode {
 	int x, y;
 	Value* value;
 }

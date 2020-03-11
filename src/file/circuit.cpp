@@ -31,3 +31,8 @@ Circuit::Circuit(const char* _name, const char* _label, Circuit::Side _labelup, 
 Circuit::~Circuit() {
 
 }
+
+bool _CircuitCmp::cmp::operator()(Part *a, Part *b) const
+{
+	return a->getUID() > b->getUID();
+}
