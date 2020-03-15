@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include <cstdlib>
 
@@ -25,18 +26,38 @@ namespace CircReader {
 		for (XMLElement* library = project->FirstChildElement("lib"); library; library = library->NextSiblingElement("lib")) {
 			const char* name; int id;
 			library->QueryStringAttribute("desc", &name);
-			library->QueryStringAttribute("name", &id);
+			library->QueryIntAttribute("name", &id);
 			string sname(name);
-			LibraryManager::regLibrary(name, id, LibraryManager::loadLibrary());
+			LibraryManager::regLibrary(name, id, LibraryManager::loadLibrary(name, id));
 		}
-		int circcount = 0;
+		std::map<int, XMLElement*> xmlcircreadymap;
+		int i = 0;
 		for (XMLElement* circuit = project->FirstChildElement("circuit"); circuit; circuit = circuit->NextSiblingElement("circuit")) {
-			circuitVector->push_back(readCirc(circuit));
+			xmlcircreadymap.insert({ i, circuit });
+			i++;
 		}
-		return circcount;
+
+		int nc = 0;
+		int ci = 0;
+		while (xmlcircreadymap.size() != nc) {
+			cout << "Trying " << ci << endl;
+			if (xmlcircreadymap[ci] == NULL) continue;
+			Circuit* readc = readCirc(xmlcircreadymap[ci], circuitVector);
+			if (readc) {
+				circuitVector->push_back(readc);
+				xmlcircreadymap[ci] = NULL;
+				nc++;
+				cout << "Success " << ci << endl;
+			} else {
+				cout << "Fail " << ci << endl;
+			}
+			if (++ci == xmlcircreadymap.size()) ci = 0;
+		}
+
+		return circuitVector->size();
 	}
 
-	Circuit* readCirc(XMLElement* circuit) {
+	Circuit* readCirc(XMLElement* circuit, std::vector<Circuit*>* circuitVector) {
 		const char* circname;
 		const char* label;
 		const char* slabelup;
@@ -67,7 +88,19 @@ namespace CircReader {
 			char* cposv;
 			strcpy(cposv, cpos);
 			pos = POSITION_GENERATE(atoi(strtok(cposv, "(,)")), atoi(strtok(NULL, "(,)")));
-			Part* p = new Part(uid++, LibraryManager::findPartManager(libnum)->findPartID(cname), pos);
+			Circuit fc(cname, NULL, (Circuit::Side)0, NULL);
+			std::vector<Circuit*>::iterator i = std::find_if(circuitVector->begin(), circuitVector->end(),
+				[cname](Circuit* c) { return strcmp(c->getName(), cname) == 0; }
+			);
+			_PartID pid = UINT64_MAX;
+			if (libnum == -1 && i == circuitVector->end()) {
+				return NULL;
+			} else if (i != circuitVector->end()) {
+				pid = PARTID_GENERATE(UINT32_MAX, circuitVector->begin() - i);
+			} else {
+				pid = LibraryManager::findPartManager(libnum)->findPartID(cname);
+			}
+			Part* p = new Part(uid++, pid, pos);
 			for (XMLElement* copt = comp->FirstChildElement("a"); copt; copt = copt->NextSiblingElement("a")) {
 				const char* k; const char* v;
 				copt->QueryStringAttribute("name", &k);
