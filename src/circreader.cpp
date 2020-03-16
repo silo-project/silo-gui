@@ -2,13 +2,10 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-
 #include <cstdlib>
 
-#include "../tinyxml2/tinyxml2.h"
-#include "circreader.hpp"
-#include "librarymanager.hpp"
-#include "partmanager.hpp"
+#include "tinyxml2.h"
+#include "CircuitPart.hpp"
 
 using namespace std;
 

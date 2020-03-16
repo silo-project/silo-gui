@@ -8,7 +8,7 @@
 
 #include "CircuitPart.hpp"
 
-typedef int DrawbleObject; // TODO: Sth.
+typedef int DrawableObject; // TODO: Sth.
 
 typedef uint32_t partID;
 

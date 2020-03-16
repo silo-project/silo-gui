@@ -6,15 +6,19 @@
 #include <string>
 
 #include "Position.hpp"
+#include "Part.hpp"
+#include "Pin.hpp"
 
-class Part {
+class CircuitPart {
 private:
-	Part * partPointer;
-	Position pos;
+	Part* partPointer;
 public:
+	Position pos;
 	std::map<std::string, std::string> options;
-	std::map<> pins;
-	MAP<IO Pin ID, CLASS Pin>
+	std::map<pinID, Pin> pins;
+	inline Part* getPartPointer() { return partPointer; }
+	CircuitPart(Part* pp);
+	~CircuitPart();
 };
 
 #endif
