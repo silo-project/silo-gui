@@ -11,7 +11,7 @@ typedef uint32_t libraryID;
 
 class Library {
 public:
-	extern std::map<partID, Part*> partMap;
+	std::map<partID, Part*> partMap;
 };
 
 #endif

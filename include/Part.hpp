@@ -3,16 +3,13 @@
 
 #include <cstdint>
 #include <map>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "CircuitPart.hpp"
+#include "Pin.hpp"
 
-typedef int DrawableObject; // TODO: Sth.
-
-typedef uint32_t partID;
-
-typedef std::vector<DrawableObject> DrawableVector;
+#include "type.hpp"
 
 class Part {
 private:
@@ -20,8 +17,9 @@ private:
 public:
 	inline uint32_t getLibraryID() { return LibraryID; }
 	inline uint32_t getPartID() { return PartID; }
-	CircuitPart* GenerateCircuitPart(std::map<std::string, std::string>);
-	virtual DrawableVector DrawCircuit(CircuitPart*);
+	std::map<pinID, Pin*> pins;
+	class CircuitPart* GenerateCircuitPart(std::map<std::string, std::string>);
+	DrawableVector* DrawCircuit(class CircuitPart*);
 };
 
 #endif

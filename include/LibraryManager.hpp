@@ -7,7 +7,7 @@
 
 class LibraryManager {
 public:
-	extern std::map<libraryID, Library*> libraryMap;
+	std::map<libraryID, Library*> libraryMap;
 };
 
 #endif

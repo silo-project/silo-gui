@@ -7,7 +7,7 @@ include_directories("include")
 include_directories("tinyxml2")
 
 find_package(SFML 2.5.1 COMPONENTS graphics network REQUIRED)
-add_executable(silo-gui src/main.cpp)
+add_subdirectory(src)
 target_link_libraries(silo-gui sfml-graphics sfml-network)
 
 #if (WIN32)

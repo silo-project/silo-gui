@@ -2,10 +2,10 @@
 #include <cstdlib>
 #include <vector>
 #include <SFML/Graphics.hpp>
-#include "file/circreader.hpp"
+//#include "circreader.hpp"
 
 int main(int argc, char** argv) {
-	LibraryManager libraryManager();
+//	LibraryManager libraryManager();
 
     sf::RenderWindow window(sf::VideoMode(1280, 720), "SILO");
 

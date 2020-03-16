@@ -2,8 +2,9 @@
 #include <map>
 #include <string>
 
-#include "Position.hpp"
 #include "CircuitPart.hpp"
+
+#include "Position.hpp"
 #include "Pin.hpp"
 
 CircuitPart::CircuitPart(Part* pp) {

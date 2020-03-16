@@ -4,9 +4,7 @@
 #include "Position.hpp"
 #include "Wire.hpp"
 
-typedef int pinID;
-
-typedef int pinWidth;
+#include "type.hpp"
 
 enum PinType { PIN_INPUT = 0, PIN_OUTPUT };
 
