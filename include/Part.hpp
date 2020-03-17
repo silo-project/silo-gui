@@ -12,7 +12,7 @@
 #include "type.hpp"
 
 class Part {
-private:
+protected:
 	uint32_t LibraryID, PartID;
 public:
 	inline uint32_t getLibraryID() { return LibraryID; }

@@ -13,7 +13,7 @@
 class Part;
 
 class CircuitPart {
-private:
+protected:
 	Part* partPointer;
 public:
 	Position pos;

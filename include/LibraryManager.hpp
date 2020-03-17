@@ -5,8 +5,7 @@
 
 #include "Library.hpp"
 
-class LibraryManager {
-public:
+namespace LibraryManager {
 	std::map<libraryID, Library*> libraryMap;
 };
 
