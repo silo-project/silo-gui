@@ -8,24 +8,22 @@
 #include <string>
 #include <algorithm>
 
-#include "Part.hpp"
+#include "RootPart.hpp"
 #include "CircuitPart.hpp"
 
 using namespace std;
 
-CircuitPart* Part::GenerateCircuitPart(map<string, string> options) {
+CircuitPart* RootPart::GenerateCircuitPart(map<string, string> options) {
 	CircuitPart* p = new CircuitPart(this);
 	for (const auto& kv : options) { p->options.insert(kv); }
 	for (const auto& kv : this->pins) {
-		//Pin* pin = (Pin*)malloc(sizeof(Pin));
-		Pin* pin = new Pin();
+		Pin* pin = (Pin*)malloc(sizeof(Pin));
 		memcpy(pin, kv.second, sizeof(Pin));
 		p->pins.insert({ kv.first, pin });
 	}
 	return p;
 }
 
-DrawableVector * Part::DrawCircuit(CircuitPart *)
-{
+DrawableVector * RootPart::DrawCircuit(CircuitPart* p) {
 	return nullptr;
 }

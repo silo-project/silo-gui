@@ -10,18 +10,22 @@
 #include "Position.hpp"
 #include "Pin.hpp"
 
-class Part;
+class RootPart;
 
 class CircuitPart {
 protected:
-	Part* partPointer;
+	RootPart* partPointer;
 public:
 	Position pos;
 	std::map<std::string, std::string> options;
 	std::map<pinID, Pin*> pins;
-	inline Part* getPartPointer() { return partPointer; }
-	CircuitPart(Part* pp);
+	inline RootPart* getPartPointer() { return partPointer; }
+	CircuitPart(RootPart* pp);
 	~CircuitPart();
+};
+
+struct CircuitPartonCircuitPlane : public Position {
+	CircuitPart* c;
 };
 
 #endif

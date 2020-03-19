@@ -3,15 +3,11 @@
 
 #include <cstdint>
 
-#include "Part.hpp"
-
-#define ROOT_LIBRARY UINT32_MAX
-
-typedef uint32_t libraryID;
+#include "RootPart.hpp"
 
 class Library {
 public:
-	std::map<partID, Part*> partMap;
+	std::map<rootPartID, RootPart*> rootPartMap;
 };
 
 #endif

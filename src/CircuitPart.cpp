@@ -7,7 +7,7 @@
 #include "Position.hpp"
 #include "Pin.hpp"
 
-CircuitPart::CircuitPart(Part* pp) {
+CircuitPart::CircuitPart(RootPart* pp) {
 	partPointer = pp;
 }
 

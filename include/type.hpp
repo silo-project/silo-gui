@@ -1,22 +1,31 @@
 #ifndef TYPE_H
 #define TYPE_H
 
-typedef int pinID;
+using pinID = int;
 
-typedef int pinWidth;
+using pinWidth = int;
 
 #include <vector>
 
-typedef int DrawableObject;
+using DrawableObject = int;
 
-typedef uint32_t partID;
+using partID = uint32_t;
 
-typedef std::vector<DrawableObject> DrawableVector;
+using DrawableVector = std::vector<DrawableObject>;
 
 enum Side {
 	NORTH = 1, SOUTH, EAST, WEST
 };
 
-typedef int wireID;
+using planeID = uint32_t;
+using xy = int32_t;
+
+using wireID = int;
+
+using libraryID = uint32_t;
+
+using rootPartID = uint32_t;
+
+#define ROOT_LIBRARY UINT32_MAX
 
 #endif

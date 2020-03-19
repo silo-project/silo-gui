@@ -3,14 +3,18 @@
 
 #include <cstdint>
 
-struct xy {
-	int32_t x;
-	int32_t y;
+#include "type.hpp"
+
+struct Position {
+	planeID p;
+	xy x;
+	xy y;
 };
 
-union Position {
-	uint64_t value;
-	xy xy;
-};
+namespace PositionUtil {
+	inline planeID getPlaneID(Position* pos) { return pos->p; }
+	inline xy getX(Position* pos) { return pos->x; }
+	inline xy getY(Position* pos) { return pos->y; }
+}
 
 #endif

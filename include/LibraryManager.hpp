@@ -5,8 +5,11 @@
 
 #include "Library.hpp"
 
-namespace LibraryManager {
-	std::map<libraryID, Library*> libraryMap;
+class LibraryManager {
+protected:
+	static std::map<libraryID, Library*>* libraryMap;
+public:
+	static auto getInstance();
 };
 
 #endif

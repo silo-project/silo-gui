@@ -1,5 +1,6 @@
 #include "tinyxml2.h"
 
 namespace FileLoader {
-	int LoadCircuit(tinyxml2::XMLElement*);
+	int LoadFile(const char*);
+	int LoadCircuit(const tinyxml2::XMLElement*);
 }

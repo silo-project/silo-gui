@@ -1,12 +1,28 @@
 #include "tinyxml2.h"
 
+#include "LibraryManager.hpp"
 #include "FileLoader.hpp"
 #include "type.hpp"
-#include "Part.hpp"
+#include "RootPart.hpp"
 
 using namespace tinyxml2;
 
-int FileLoader::LoadCircuit(XMLElement* circuit) {
+int FileLoader::LoadFile(const char* file) {
+	XMLDocument doc;
+	doc.LoadFile(file);
+	XMLElement* project = doc.FirstChildElement("project");
+	for (XMLElement* library = project->FirstChildElement("lib"); library; library = library->NextSiblingElement("lib")) {
+		const char* name; int id;
+		library->QueryStringAttribute("desc", &name);
+		library->QueryIntAttribute("name", &id);
+		string sname(name);
+		LibraryManager.getInstance();
+		LibraryManager
+		LibraryManager::regLibrary(name, id, LibraryManager::loadLibrary(name, id));
+	}
+}
+
+int FileLoader::LoadCircuit(const XMLElement* circuit) {
 	const char* circname;
 	const char* label;
 	const char* slabelup;

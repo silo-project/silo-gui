@@ -13,8 +13,9 @@ struct Wire {
 	WirePull pullup;
 };
 
-struct WirePos {
-	Position a, b;
+struct WirePosition {
+	Position* a;
+	Position* b;
 };
 
 #endif
