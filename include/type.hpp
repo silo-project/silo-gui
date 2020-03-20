@@ -18,7 +18,7 @@ enum Side {
 };
 
 using planeID = uint32_t;
-using xy = int32_t;
+using xy = uint32_t;
 
 using wireID = int;
 

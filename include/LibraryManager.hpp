@@ -2,14 +2,14 @@
 #define LIBRARYMANAGER_H
 
 #include <map>
+#include <string>
 
 #include "Library.hpp"
 
 class LibraryManager {
-protected:
-	static std::map<libraryID, Library*>* libraryMap;
 public:
-	static auto getInstance();
+	std::map<std::string, libraryID> libraryNameMap;
+	std::map<libraryID, Library*> libraryMap;
 };
 
 #endif

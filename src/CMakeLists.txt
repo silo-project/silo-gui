@@ -2,8 +2,10 @@ add_executable(silo-gui
 main.cpp
 tinyxml2.cpp
 
+CalculatePlane.cpp
 CircuitPart.cpp
+FileLoader.cpp
 Library.cpp
-LibraryManager.cpp
-Part.cpp
+RootPart.cpp
+RootPlane.cpp
 )

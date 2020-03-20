@@ -1,28 +1,48 @@
+#include <string>
+
 #include "tinyxml2.h"
 
-#include "LibraryManager.hpp"
-#include "FileLoader.hpp"
 #include "type.hpp"
-#include "RootPart.hpp"
 
+#include "FileLoader.hpp"
+#include "RootPart.hpp"
+#include "RootPlane.hpp"
+#include "LibraryManager.hpp"
+
+using namespace std;
 using namespace tinyxml2;
 
-int FileLoader::LoadFile(const char* file) {
+int FileLoader::LoadFile(const char* file, LibraryManager* rootlm, int rootpartid) {
 	XMLDocument doc;
 	doc.LoadFile(file);
 	XMLElement* project = doc.FirstChildElement("project");
+	LibraryManager* locallm = new LibraryManager();
 	for (XMLElement* library = project->FirstChildElement("lib"); library; library = library->NextSiblingElement("lib")) {
 		const char* name; int id;
 		library->QueryStringAttribute("desc", &name);
 		library->QueryIntAttribute("name", &id);
-		string sname(name);
-		LibraryManager.getInstance();
-		LibraryManager
-		LibraryManager::regLibrary(name, id, LibraryManager::loadLibrary(name, id));
+		if (rootlm->libraryNameMap.find(name) == rootlm->libraryNameMap.end()) {
+			if (name[0] == '#') { // Default Library
+
+			}
+			else { // File Library
+				LoadFile(name, rootlm, rootpartid);
+			}
+		} else {
+			locallm->libraryNameMap.insert({ name, id });
+			locallm->libraryMap.insert({id, rootlm->libraryMap.find(rootlm->libraryNameMap.find(name)->second)->second});
+		}
+	}
+	for (XMLElement* circuit = project->FirstChildElement("circuit"); circuit; circuit = circuit->NextSiblingElement("circuit")) {
+		RootPartbyRootPlane* rpc = LoadCircuit(circuit, locallm);
+		vector<RootPartonRootPlane*> prpv = rpc->Plane.rootPartVector;
+		// TODO: GOD DAMN
+		rootlm->libraryMap[UINT32_MAX]->rootPartMap.insert({ rootpartid, rpc });
+		rootpartid++;
 	}
 }
 
-int FileLoader::LoadCircuit(const XMLElement* circuit) {
+RootPartbyRootPlane* FileLoader::LoadCircuit(const XMLElement* circuit, LibraryManager* lm) {
 	const char* circname;
 	const char* label;
 	const char* slabelup;

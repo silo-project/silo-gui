@@ -7,7 +7,7 @@
 
 class RootPlane {
 public:
-	std::vector<RootPartonRootPlane*> partVector;
+	std::vector<RootPartonRootPlane*> rootPartVector;
 	std::map<wireID, WirePosition*> wirePositionMap;
 	RootPlane();
 	~RootPlane();

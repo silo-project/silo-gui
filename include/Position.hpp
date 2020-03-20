@@ -15,6 +15,7 @@ namespace PositionUtil {
 	inline planeID getPlaneID(Position* pos) { return pos->p; }
 	inline xy getX(Position* pos) { return pos->x; }
 	inline xy getY(Position* pos) { return pos->y; }
+	inline uint64_t getPlanedX(Position* pos) { return (pos->p) << 32 | (pos->x); }
 }
 
 #endif

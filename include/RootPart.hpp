@@ -23,7 +23,13 @@ public:
 	DrawableVector* DrawCircuit(class CircuitPart*);
 };
 
+class RootPartbyRootPlane : public RootPart {
+public:
+	RootPlane Plane;
+};
+
 struct RootPartonRootPlane : public Position {
+public:
 	RootPart* r;
 };
 
