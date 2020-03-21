@@ -7,7 +7,7 @@
 
 class Library {
 public:
-	std::map<rootPartID, RootPart*> rootPartMap;
+	std::vector<RootPart*> rootPartVector;
 };
 
 #endif

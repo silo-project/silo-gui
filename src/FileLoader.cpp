@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <string>
 
 #include "tinyxml2.h"
@@ -9,8 +10,35 @@
 #include "RootPlane.hpp"
 #include "LibraryManager.hpp"
 
-using namespace std;
+using std::string;
+using std::vector;
 using namespace tinyxml2;
+
+Library* FileLoader::LoadDefaultLibrary(const char* name) {
+	Library* dl = new Library();
+	if (strcmp(name, "#Wiring") == 0) {
+		dl->rootPartVector.push_back({ new RootPart() }); // TODO DAKDJSHGAEGASD
+	}
+	else if (strcmp(name, "#Gates") == 0) {
+
+	}
+	else if (strcmp(name, "#Plexers") == 0) {
+
+	}
+	else if (strcmp(name, "#Arithmetic") == 0) {
+
+	}
+	else if (strcmp(name, "#Memory") == 0) {
+
+	}
+	else if (strcmp(name, "#I/O") == 0) {
+
+	}
+	else if (strcmp(name, "#Base") == 0) {
+
+	}
+	return dl;
+}
 
 int FileLoader::LoadFile(const char* file, LibraryManager* rootlm, int rootpartid) {
 	XMLDocument doc;
@@ -21,17 +49,37 @@ int FileLoader::LoadFile(const char* file, LibraryManager* rootlm, int rootparti
 		const char* name; int id;
 		library->QueryStringAttribute("desc", &name);
 		library->QueryIntAttribute("name", &id);
-		if (rootlm->libraryNameMap.find(name) == rootlm->libraryNameMap.end()) {
+		string sname(name);
 			if (name[0] == '#') { // Default Library
+				vector<string>::iterator frlm = std::find(
+					rootlm->libraryNameVector.begin(), rootlm->libraryNameVector.end(), sname);
+				vector<string>::iterator fllm = std::find(
+					locallm->libraryNameVector.begin(), locallm->libraryNameVector.end(), sname);
+				bool lerlm = frlm == rootlm->libraryNameVector.end(); // NOT EXISTS in Root LibraryManager
+				bool lellm = fllm == locallm->libraryNameVector.end(); // NOT EXISTS in Local LibraryManager
+				Library* dl = nullptr;
+				if (!lerlm) {
+					dl = LoadDefaultLibrary(name); // Never Created
 
+					locallm->libraryNameVector.insert(locallm->libraryNameVector.begin() + id, sname);
+					locallm->libraryVector.insert(locallm->libraryVector.begin() + id, dl);
+					rootlm->libraryNameVector.push_back(sname);
+					rootlm->libraryVector.push_back(dl);
+				} else {
+					if (!lellm) { // Exists in Root, Not in Local
+						locallm->libraryNameVector.insert(locallm->libraryNameVector.begin() + id, sname);
+						locallm->libraryVector.insert(locallm->libraryVector.begin() + id,
+							rootlm->libraryVector.at(static_cast<int>(frlm - rootlm->libraryNameVector.begin())));
+					}
+				}
 			}
 			else { // File Library
 				LoadFile(name, rootlm, rootpartid);
-			}
+			}/*
 		} else {
 			locallm->libraryNameMap.insert({ name, id });
 			locallm->libraryMap.insert({id, rootlm->libraryMap.find(rootlm->libraryNameMap.find(name)->second)->second});
-		}
+		}*/
 	}
 	for (XMLElement* circuit = project->FirstChildElement("circuit"); circuit; circuit = circuit->NextSiblingElement("circuit")) {
 		RootPartbyRootPlane* rpc = LoadCircuit(circuit, locallm);
