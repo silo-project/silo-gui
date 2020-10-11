@@ -41,11 +41,14 @@ typedef struct sendformat {
 
 // functions
 int NodeInit();
-int NodeTest();
+int NodeReSizeTable(void);
 
 NODEID NodeCreate();
-void NodeAddPtr(NODE * node, NODEID nodeid);
 void NodeDelete(NODEID);
+
+void NodeRecycle(NODEID);
+
+void NodeAddPtr(NODE * node, NODEID nodeid);
 
 NODEID NodeGetID();
 NODEID NodeGetNumber();

@@ -23,6 +23,9 @@ typedef unsigned SILO_ADDR DEFT_ADDR;
 typedef DEFT_WORD SIGNALSIZE;
 typedef DEFT_WORD NODEID;
 typedef DEFT_WORD PORTID;
+#ifndef __cplusplus
+typedef enum logic {false, true} bool;
+#endif
 
 #define BASICMEM 4096 // 4KiB = 1Page
 

@@ -20,10 +20,6 @@ typedef struct signalstruct {
 } SIGNAL;
 
 
-SIGNALSIZE SignalGetFloat(SIGNAL signal);
-SIGNALSIZE SignalGetError(SIGNAL signal);
-
-
 #endif
 
 #ifdef __cplusplus

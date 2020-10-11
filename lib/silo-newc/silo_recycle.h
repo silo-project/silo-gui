@@ -9,8 +9,8 @@ extern "C" {
 
 
 int RecyInit();
+int RecyReSizeStack();
 int RecyStatus(void);
-int RecyAbleID();
 
 void   RecyPush(NODEID nodeid);
 NODEID RecyPull(void);
