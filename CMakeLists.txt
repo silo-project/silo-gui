@@ -1,20 +1,25 @@
 cmake_minimum_required(VERSION 3.15)
+include(cmake/ExternalProject.cmake)
+
 project(silo-gui CXX)
 
 set(CMAKE_VERBOSE_MAKEFILE true)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(LIB_SILO-NEWC_DIR ${CMAKE_SOURCE_DIR}/lib/silo-newc)
+ExternalProject_Add(uWebSockets
+        GIT_REPOSITORY https://github.com/uNetworking/uWebSockets.git
+        GIT_TAG v18.15.0
+        PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/uWebSockets
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/uWebSockets
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND "${MAKE}"
+        INSTALL_COMMAND ""
+)
 
-include_directories("include")
-#include_directories("tinyxml2")
-
-#find_package(SFML 2.5.1 COMPONENTS graphics network REQUIRED)
-#target_link_libraries(silo-gui sfml-graphics sfml-network)
-include_directories(${LIB_SILO-NEWC_DIR})
 add_subdirectory(src)
-target_link_libraries(silo-gui ${LIB_SILO-NEWC_DIR}/libsilo-newc.a)
+
+add_dependencies(silo-gui uWebSockets)
 
 #if (WIN32)
 #	target_link_libraries(silo-gui ws2_32)
