@@ -7,19 +7,25 @@ set(CMAKE_VERBOSE_MAKEFILE true)
 
 set(CMAKE_CXX_STANDARD 17)
 
-ExternalProject_Add(uWebSockets
-        GIT_REPOSITORY https://github.com/uNetworking/uWebSockets.git
-        GIT_TAG v18.15.0
-        PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/uWebSockets
-        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/uWebSockets
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND "${MAKE}"
-        INSTALL_COMMAND ""
-)
+# git clone https://libwebsockets.org/repo/libwebsockets -b v4.1-stable
+#  in lib/
+# configure to output to build/
+# and make
+# https://libwebsockets.org/lws-api-doc-master/html/md_README.build.html
+# https://slproweb.com/products/Win32OpenSSL.html 1.1.1b
+
+find_package(OpenSSL REQUIRED)
+include_directories(${OPENSSL_INCLUDE_DIR})
+link_directories(${OPENSSL_LIBRARIES})
+message(STATUS "Using OpenSSL ${OPENSSL_VERSION}")
+
+include_directories(${CMAKE_SOURCE_DIR}/lib/libwebsockets/build/include/)
 
 add_subdirectory(src)
 
-add_dependencies(silo-gui uWebSockets)
+target_link_libraries(silo-gui ${CMAKE_SOURCE_DIR}/lib/libwebsockets/build/lib/libwebsockets_static.a)
+
+#add_dependencies(silo-gui uWebSockets)
 
 #if (WIN32)
 #	target_link_libraries(silo-gui ws2_32)

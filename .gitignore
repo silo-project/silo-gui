@@ -4,4 +4,4 @@ make/
 *.vcxproj*
 *.sln
 .vs/
-uWebSockets/
+lib/
