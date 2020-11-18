@@ -1,3 +1,6 @@
+#include <winsock2.h>
+
+
 #include <cstring>
 #include <csignal>
 
