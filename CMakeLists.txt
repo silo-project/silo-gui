@@ -16,19 +16,20 @@ set(CMAKE_CXX_STANDARD 17)
 
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
-link_directories(${OPENSSL_LIBRARIES})
-message(STATUS "Using OpenSSL ${OPENSSL_VERSION}")
+#link_directories(${OPENSSL_LIBRARY_DIR})
+message(STATUS "Using OpenSSL ${OPENSSL_VERSION} ${OPENSSL_LIBRARIES}")
 
 include_directories(${CMAKE_SOURCE_DIR}/lib/libwebsockets/build/include/)
 
 add_subdirectory(src)
 
 target_link_libraries(silo-gui ${CMAKE_SOURCE_DIR}/lib/libwebsockets/build/lib/libwebsockets_static.a)
+target_link_libraries(silo-gui ${OPENSSL_LIBRARIES})
 
 #add_dependencies(silo-gui uWebSockets)
 
-#if (WIN32)
-#	target_link_libraries(silo-gui ws2_32)
-#else (WIN32)
-#
-#endif (WIN32)
+if (WIN32)
+	target_link_libraries(silo-gui ws2_32)
+else (WIN32)
+
+endif (WIN32)
