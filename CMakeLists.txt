@@ -16,8 +16,9 @@ set(CMAKE_CXX_STANDARD 17)
 
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})
-#link_directories(${OPENSSL_LIBRARY_DIR})
 message(STATUS "Using OpenSSL ${OPENSSL_VERSION} ${OPENSSL_LIBRARIES}")
+
+# LibSSL.dll LibCrypto.dll 복사해 놓을 것
 
 include_directories(${CMAKE_SOURCE_DIR}/lib/libwebsockets/build/include/)
 
