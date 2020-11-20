@@ -3,12 +3,52 @@
 
 #include <libwebsockets.h>
 
+static int
+callback_protocol(struct lws *wsi, enum lws_callback_reasons reason,
+                  void *user, void *in, size_t len)
+{
+    switch (reason) {
+
+        case LWS_CALLBACK_ESTABLISHED:
+            lwsl_user("LWS_CALLBACK_ESTABLISHED\n");
+            lws_set_timer_usecs(wsi, 20 * LWS_USEC_PER_SEC);
+            lws_set_timeout(wsi, static_cast<pending_timeout>(1), 60);
+            break;
+
+        case LWS_CALLBACK_TIMER:
+            lwsl_user("LWS_CALLBACK_TIMER\n");
+            lws_set_timer_usecs(wsi, 20 * LWS_USEC_PER_SEC);
+            lws_set_timeout(wsi, static_cast<pending_timeout>(1), 60);
+            break;
+
+        case LWS_CALLBACK_CLOSED:
+            lwsl_user("LWS_CALLBACK_CLOSED\n");
+            break;
+
+        default:
+            break;
+    }
+
+    return 0;
+}
+
+static struct lws_protocols protocols[] = {
+        { "http", lws_callback_http_dummy, 0, 0 },
+        { "timer", callback_protocol, 0, 0 },
+        { NULL, NULL, 0, 0 } /* terminator */
+};
+
+static const lws_retry_bo_t retry = {
+        .secs_since_valid_ping = 3,
+        .secs_since_valid_hangup = 10,
+};
+
 static int interrupted;
 
 static const struct lws_http_mount mount = {
         /* .mount_next */		NULL,		/* linked-list "next" */
         /* .mountpoint */		"/",		/* mountpoint URL */
-        /* .origin */			"./mount-origin", /* serve from dir */
+        /* .origin */			"./mount-origin",  /* serve from dir */
         /* .def */			"index.html",	/* default filename */
         /* .protocol */			NULL,
         /* .cgienv */			NULL,
@@ -30,7 +70,8 @@ void sigint_handler(int sig)
     interrupted = 1;
 }
 
-int main(int argc, const char** argv) {
+int main(int argc, const char **argv)
+{
     struct lws_context_creation_info info;
     struct lws_context *context;
     const char *p;
@@ -48,17 +89,30 @@ int main(int argc, const char** argv) {
         logs = atoi(p);
 
     lws_set_log_level(logs, NULL);
-    lwsl_user("LWS minimal http server | visit http://localhost:7681\n");
+    lwsl_user("LWS minimal ws server | visit http://localhost:7681 (-s = use TLS / https)\n");
 
     memset(&info, 0, sizeof info); /* otherwise uninitialized garbage */
     info.port = 7681;
     info.mounts = &mount;
-    info.error_document_404 = "/404.html";
+    info.protocols = protocols;
+    info.vhost_name = "localhost";
     info.options =
             LWS_SERVER_OPTION_HTTP_HEADERS_SECURITY_BEST_PRACTICES_ENFORCE;
 
-    if (lws_cmdline_option(argc, argv, "--h2-prior-knowledge"))
-        info.options |= LWS_SERVER_OPTION_H2_PRIOR_KNOWLEDGE;
+#if defined(LWS_WITH_TLS)
+    if (lws_cmdline_option(argc, argv, "-s")) {
+        lwsl_user("Server using TLS\n");
+        info.options |= LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
+        info.ssl_cert_filepath = "localhost-100y.cert";
+        info.ssl_private_key_filepath = "localhost-100y.key";
+    }
+#endif
+
+    if (lws_cmdline_option(argc, argv, "-h"))
+        info.options |= LWS_SERVER_OPTION_VHOST_UPG_STRICT_HOST_CHECK;
+
+    if (lws_cmdline_option(argc, argv, "-v"))
+        info.retry_and_idle_policy = &retry;
 
     context = lws_create_context(&info);
     if (!context) {

@@ -2,8 +2,6 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/uWebSockets" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/uWebSockets/fuzzing/libEpollFuzzer" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/uWebSockets/uSockets" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/libwebsockets" vcs="Git" />
   </component>
 </project>

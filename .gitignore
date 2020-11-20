@@ -1,7 +1,8 @@
 cmake-build-debug/
-.idea/
 make/
 *.vcxproj*
 *.sln
 .vs/
 lib/
+libcrypto*.dll
+libssl*.dll
