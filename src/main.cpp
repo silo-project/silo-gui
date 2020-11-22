@@ -236,7 +236,7 @@ static const struct lws_protocol_vhost_options pvo_interrupted = {
 static const struct lws_protocol_vhost_options pvo = {
         NULL,				/* "next" pvo linked-list */
         &pvo_interrupted,		/* "child" pvo linked-list */
-        "lws-minimal-server-echo",	/* protocol name we belong to on this vhost */
+        "backend",	/* protocol name we belong to on this vhost */
         ""				/* ignored */
 };
 static const struct lws_extension extensions[] = {
@@ -314,9 +314,6 @@ int main(int argc, const char **argv)
         info.ssl_private_key_filepath = "localhost-100y.key";
     }
 #endif
-
-    if (lws_cmdline_option(argc, argv, "-h"))
-        info.options |= LWS_SERVER_OPTION_VHOST_UPG_STRICT_HOST_CHECK;
 
     if (lws_cmdline_option(argc, argv, "-v"))
         info.retry_and_idle_policy = &retry;
