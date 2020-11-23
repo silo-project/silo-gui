@@ -12,7 +12,7 @@ int main(int argc, const char **argv) {
 
     svr.set_mount_point("/", "./mount-origin");
 
-    svr.Get("/api", [](const httplib::Request &, httplib::Response &res) {
+    svr.Get("/api/hi", [](const httplib::Request &, httplib::Response &res) {
         res.set_content("Hello World!", "text/plain");
     });
 
