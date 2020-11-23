@@ -4,6 +4,10 @@
     <script src="/backend.js"></script>
 </head>
 <body>
+    <form action="/api/uploadlogisimfile" accept-charset="utf-8" name="uploadLogisimFile" method="post">
+        <input type="file" name="file" id="uploadLogisimFileOpenInput" accept="text/x-logisim">
+        <input type="submit" value="submit"/>
+    </form>
 LWS wsi timer <b>minimal ws server timer example</b>.<br>
 This opens a ws connection back to the server and just sits there
 setting the timer to fire every 20s, which resets the wsi timeout
