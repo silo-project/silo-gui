@@ -5,25 +5,62 @@
 #include <string>
 #include <filesystem>
 
+#include <tinyxml2.h>
+
 #include "library.h"
 
-CircLibrary* LibraryManager::openCircLibrary(const std::filesystem::path &filepath) { // "C:/Example.circ"
-    auto* lib = new CircLibrary();
+using namespace tinyxml2;
+
+Library* LibraryManager::openCircLibrary(const std::string &filepath, Library* lib) { // "C:/Example.circ"
+    std::map<int, Library*> libnumbernamemap;
+    if(lib == nullptr) lib = new Library();
     lib->type = LibraryType::LibraryType_Circ;
+    XMLDocument doc;
+    doc.LoadFile(filepath.c_str());
+
+    XMLElement* tagproject = doc.FirstChildElement("project");
+
+    XMLElement* taglib = tagproject->FirstChildElement("lib");
+    while (taglib != nullptr) {
+        taglib = taglib->NextSiblingElement("lib");
+        const char * libname = nullptr;
+        taglib->QueryStringAttribute("desc", &libname);
+        std::string libsname(libname);
+        Library* libpointer = searchLibrary(libsname);
+        if(libpointer == nullptr) {
+            libpointer = new Library();
+            putLibrary(libsname, libpointer);
+        }
+        lib->parents.push_back(libpointer);
+        libpointer->childs.push_back(lib);
+        int num = -1;
+        taglib->QueryIntAttribute("name", &num);
+        libnumbernamemap.insert(std::pair(num, libpointer));
+    }
+
+
+    
     return lib;
 }
 
-ZipLibrary* LibraryManager::openZipLibrary(const std::filesystem::path &filepath) { // "C:/Example.zip"
-    auto* lib = new ZipLibrary();
+Library* LibraryManager::openZipLibrary(const std::string &filepath, Library* lib) { // "C:/Example.zip"
+    if(lib == nullptr) lib = new Library();
     lib->type = LibraryType::LibraryType_Zip;
     return lib;
 }
 
-const Library* LibraryManager::searchLibrary(const std::string &name) {
+Library* LibraryManager::searchLibrary(const std::string &name) {
     auto lib = this->libraryMap.find(name);
     return (lib == this->libraryMap.end()) ? nullptr : lib->second;
 }
 
-void LibraryManager::putLibrary(const std::string &name, const Library* lib) {
-    this->libraryMap.insert(std::pair<std::string, const Library*>(name, lib));
+void LibraryManager::putLibrary(const std::string &name, Library* lib) {
+    this->libraryMap.insert(std::pair<std::string, Library*>(name, lib));
+}
+
+bool cLibrary::isReady() {
+    bool ready = this->type != eLibraryType::LibraryType_Abstract;
+    for(const auto& t : this->parents)
+        ready = ready & t->isReady();
+    return ready;
 }

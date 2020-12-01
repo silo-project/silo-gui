@@ -21,31 +21,22 @@ typedef class cLibrary Library;
 
 class cLibrary {
 public:
-    LibraryType type;
-    std::filesystem::path filepath = "";
+    LibraryType type = eLibraryType::LibraryType_Abstract;
+    std::filesystem::path path = "";
     std::vector<Library*> parents;
     std::vector<Library*> childs;
+    std::map<std::string, Part*> partMap;
+    bool isReady();
 };
-
-typedef class cZipLibrary : public Library {
-public:
-    std::filesystem::path folderpath = "";
-    std::map<std::string, ComputePart*> partMap;
-} ZipLibrary;
-
-typedef class cCircLibrary : public Library {
-public:
-    std::map<std::string, CircPart*> partMap;
-} CircLibrary;
 
 typedef class LibraryManager {
 protected:
-    std::map<std::string, const Library*> libraryMap;
+    std::map<std::string, Library*> libraryMap;
 public:
-    static CircLibrary* openCircLibrary(const std::filesystem::path &filepath);
-    static ZipLibrary* openZipLibrary(const std::filesystem::path &filepath);
-    const Library* searchLibrary(const std::string& name);
-    void putLibrary(const std::string& name, const Library* lib);
+    Library* openCircLibrary(const std::string &filepath, Library* lib = nullptr);
+    Library* openZipLibrary(const std::string &filepath, Library* lib = nullptr);
+    Library* searchLibrary(const std::string& name);
+    void putLibrary(const std::string& name, Library* lib);
 } LibraryManager;
 
 
