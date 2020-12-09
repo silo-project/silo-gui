@@ -38,6 +38,18 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, Library* l
         libnumbernamemap.insert(std::pair(num, libpointer));
     }
 
+    XMLElement* tagcircuit = tagproject->FirstChildElement("circuit");
+    while (tagcircuit != nullptr) {
+        tagcircuit = tagcircuit->NextSiblingElement("circuit");
+        const char * circuitname = nullptr;
+        tagcircuit->QueryStringAttribute("name", &circuitname);
+        std::string libsname(circuitname);
+        auto* thispart = new AbstractCircPart();
+        thispart->mapAbstractPart;
+
+        lib->mapAbstractPart.insert(std::pair<std::string, AbstractPart*>(libsname, static_cast<AbstractPart*>(thispart)));
+    }
+
 
     
     return lib;
@@ -59,7 +71,7 @@ void LibraryManager::putLibrary(const std::string &name, Library* lib) {
 }
 
 bool cLibrary::isReady() {
-    bool ready = this->type != eLibraryType::LibraryType_Abstract;
+    bool ready = this->type != eLibraryType::LibraryType_UNDEF;
     for(const auto& t : this->parents)
         ready = ready & t->isReady();
     return ready;

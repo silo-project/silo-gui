@@ -12,6 +12,13 @@
 
 struct NODE;
 
+class cAbstractPart;
+class cAbstractCircPart;
+class cAbstractComputePart;
+class cPart;
+class cCircPart;
+class cComputePart;
+
 typedef unsigned int portID;
 
 typedef struct sPosition {
@@ -23,6 +30,7 @@ typedef struct sPosition {
 } Position;
 
 typedef enum ePartType {
+    PartType_UNDEF = 0,
     PartType_Circ = 1,
     PartType_Zip
 } PartType;
@@ -34,17 +42,41 @@ typedef struct sAttribute {
 typedef class cPart {
 public:
     PartType type;
-    std::map<std::string, Attribute> attributeMap;
-    std::map<portID, WireNet*> wireNetMap;
+    std::map<std::string, Attribute> mapAttribute;
+    std::map<portID, WireNet*> mapWireNet;
     std::string draw = "";
 } Part;
 
 typedef class cComputePart : public Part {
+public:
+    explicit cComputePart(const class cAbstractComputePart *rootpart);
     void(* function)(NODE*) = nullptr;
 } ComputePart;
 
 typedef class cCircPart : public Part {
-    std::map<Position, Part*> partMap;
+public:
+    explicit cCircPart(const class cAbstractCircPart *rootpart);
+    std::map<Position, Part*> mapPart;
 } CircPart;
+
+typedef class cAbstractPart {
+public:
+    PartType type;
+    std::map<std::string, Attribute> mapAbstractAttribute;
+    std::map<portID, WireNetID> mapWireNetID;
+    std::string draw = "";
+} AbstractPart;
+
+typedef class cAbstractComputePart : public AbstractPart {
+public:
+    cAbstractComputePart();
+    void(* function)(NODE*) = nullptr;
+} AbstractComputePart;
+
+typedef class cAbstractCircPart : public AbstractPart {
+public:
+    cAbstractCircPart();
+    std::map<Position, AbstractPart*> mapAbstractPart;
+} AbstractCircPart;
 
 #endif //SILO_GUI_PART_H

@@ -12,7 +12,7 @@
 #define SILO_GUI_LIBRARY_H
 
 typedef enum eLibraryType {
-    LibraryType_Abstract,
+    LibraryType_UNDEF = 0,
     LibraryType_Circ = 1,
     LibraryType_Zip
 } LibraryType;
@@ -21,11 +21,11 @@ typedef class cLibrary Library;
 
 class cLibrary {
 public:
-    LibraryType type = eLibraryType::LibraryType_Abstract;
+    LibraryType type = eLibraryType::LibraryType_UNDEF;
     std::filesystem::path path = "";
     std::vector<Library*> parents;
     std::vector<Library*> childs;
-    std::map<std::string, Part*> partMap;
+    std::map<std::string, AbstractPart*> mapAbstractPart;
     bool isReady();
 };
 

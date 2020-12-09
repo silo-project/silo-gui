@@ -1,0 +1,61 @@
+SILO API
+
+[Node]
+int NodeInit();
+노드 관리 모듈을 초기화한다.
+
+NODE * NodeCreate(void);
+노드를 생성하고 구조체의 주소값을 반환한다. 만약 생성에 실패하면 NULL 포인터를 반환한다.
+void NodeDelete(NODE *);
+노드 구조체를 삭제한다.
+
+NODEID NodeGetID();
+현재 사용 가능한 노드 번호를 얻는다. 다음 값은 자동으로 변한다.
+
+NODEID NodeGetNumber();
+현재 노드의 숫자를 반환한다.
+
+NODEID NodeGetLastID();
+마지막 노드의 번호를 반환한다.
+
+NODE * NodeGetPtr(NODEID nodeid);
+노드 번호를 이용하여 구조체의 주소를 얻는다.
+
+[Node_Type]
+int NodeUseStrg(NODE *, size_t);
+int NodeUseAttr(NODE *, size_t);
+int NodeUseInpt(NODE *, size_t);
+int NodeUseOupt(NODE *, size_t);
+노드의 각 저장공간의 크기를 설정한다. 단 이 크기는 바이트 단위가 아니라 각 공간별로 최소 사이즈가 존재한다. 즉 1로 설정해도 실제로 1바이트가 아닐수도 있다.
+
+void NodeSetType(NODE * node, void (*fn)(NODE*));
+노드 포인터 node의 처리 함수를 fn으로 설정한다.
+void NodeSetAttr(NODE * node, DEFT_WORD attr, DEFT_ADDR index);
+노드 포인터 node의 index번째 속성값을 attr로 설정한다.
+void NodeSetOupt(NODE * node, PORTID port, SENDFORM dest);
+노드 포인터 node의 포트 번호 port의 목적지를 전달 규격 dest로 설정한다.
+
+[Simulator]
+int SimuInit(void);
+시뮬레이터를 초기화한다.
+
+int Simulate(void);
+실제로 시뮬레이션을 하는 함수. 내부적으로는 SimulateStep() 함수와 연결되어 있으며 한 스텝을 시뮬레이션 한다.
+
+void SendSignal (SENDFORM, SIGNAL);
+노드에 시그널을 보낼때 사용하는 함수.
+
+void Transfer(SENDFORM, SIGNAL);
+SendSignal() 함수와 비슷하지만 needmake 값을 true로 설정한다.
+
+void SimuResetSentlist(void);
+sentlist의 목록을 초기화한다.
+
+void SimuListofNextExec(void);
+nextexec의 목록을 출력한다.
+
+int Thread_SetNumber(unsigned long long);
+스레드 개수를 설정한다. 만약 현재 스레드 개수보다 적은 값이면 스레드를 취소시킨다.
+
+unsigned long long Thread_GetNumber(void);
+현재의 스레드 개수를 반환한다.

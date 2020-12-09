@@ -14,5 +14,7 @@ public:
 
 } WireNet;
 
+typedef unsigned int WireNetID;
+
 
 #endif //SILO_GUI_WIRENET_H
