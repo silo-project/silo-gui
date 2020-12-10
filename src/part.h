@@ -15,9 +15,9 @@ struct NODE;
 class cAbstractPart;
 class cAbstractCircPart;
 class cAbstractComputePart;
-class cPart;
+/*class cPart;
 class cCircPart;
-class cComputePart;
+class cComputePart;*/
 
 typedef unsigned int portID;
 
@@ -39,7 +39,7 @@ typedef struct sAttribute {
     std::string name, value;
 } Attribute;
 
-typedef class cPart {
+/*typedef class cPart {
 public:
     PartType type;
     std::map<std::string, Attribute> mapAttribute;
@@ -57,12 +57,12 @@ typedef class cCircPart : public Part {
 public:
     explicit cCircPart(const class cAbstractCircPart *rootpart);
     std::map<Position, Part*> mapPart;
-} CircPart;
+} CircPart;*/
 
 typedef class cAbstractPart {
 public:
     PartType type;
-    std::map<std::string, Attribute> mapAbstractAttribute;
+    std::map<std::string*, std::string*> mapAbstractAttribute;
     std::map<portID, WireNetID> mapWireNetID;
     std::string draw = "";
 } AbstractPart;
