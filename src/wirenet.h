@@ -7,7 +7,7 @@
 #ifndef SILO_GUI_WIRENET_H
 #define SILO_GUI_WIRENET_H
 
-typedef struct sPosition Position;
+typedef uint64_t position;
 
 typedef class cWireNet {
 public:

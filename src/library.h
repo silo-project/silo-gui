@@ -23,8 +23,8 @@ class cLibrary {
 public:
     LibraryType type = eLibraryType::LibraryType_UNDEF;
     std::filesystem::path path = "";
-    std::vector<Library*> parents;
-    std::vector<Library*> childs;
+    std::vector<&string> parents;
+    std::vector<&string> childs;
     std::map<std::string, AbstractPart*> mapAbstractPart;
     bool isReady();
 };
@@ -33,8 +33,8 @@ typedef class LibraryManager {
 protected:
     std::map<std::string, Library*> libraryMap;
 public:
-    Library* openCircLibrary(const std::string &filepath, Library* lib = nullptr);
-    Library* openZipLibrary(const std::string &filepath, Library* lib = nullptr);
+    Library* openCircLibrary(const std::string &filepath, const std::string &name);
+    Library* openZipLibrary(const std::string &filepath, const std::string &name);
     Library* searchLibrary(const std::string& name);
     void putLibrary(const std::string& name, Library* lib);
 } LibraryManager;

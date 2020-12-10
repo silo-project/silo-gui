@@ -11,9 +11,14 @@
 
 using namespace tinyxml2;
 
-Library* LibraryManager::openCircLibrary(const std::string &filepath, Library* lib) { // "C:/Example.circ"
-    std::map<int, Library*> libnumbernamemap;
+Library* LibraryManager::openCircLibrary(const std::string &filepath, const std::string &name) { // "C:/Example.circ"
+    std::map<int, std::string> libnumbernamemap;
+
+    Library* lib = searchLibrary(name);
+
     if(lib == nullptr) lib = new Library();
+    else if(lib->type != eLibraryType::LibraryType_UNDEF) return lib;
+
     lib->type = LibraryType::LibraryType_Circ;
     XMLDocument doc;
     doc.LoadFile(filepath.c_str());
@@ -23,7 +28,7 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, Library* l
     XMLElement* taglib = tagproject->FirstChildElement("lib");
     while (taglib != nullptr) {
         taglib = taglib->NextSiblingElement("lib");
-        const char * libname = nullptr;
+        const char* libname = nullptr;
         taglib->QueryStringAttribute("desc", &libname);
         std::string libsname(libname);
         Library* libpointer = searchLibrary(libsname);
@@ -31,11 +36,11 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, Library* l
             libpointer = new Library();
             putLibrary(libsname, libpointer);
         }
-        lib->parents.push_back(libpointer);
-        libpointer->childs.push_back(lib);
+        lib->parents.push_back(libsname);
+        libpointer->childs.push_back(name);
         int num = -1;
         taglib->QueryIntAttribute("name", &num);
-        libnumbernamemap.insert(std::pair(num, libpointer));
+        libnumbernamemap.insert(std::pair(num, libsname));
     }
 
     XMLElement* tagcircuit = tagproject->FirstChildElement("circuit");
@@ -45,9 +50,56 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, Library* l
         tagcircuit->QueryStringAttribute("name", &circuitname);
         std::string libsname(circuitname);
         auto* thispart = new AbstractCircPart();
-        thispart->mapAbstractPart;
 
-        lib->mapAbstractPart.insert(std::pair<std::string, AbstractPart*>(libsname, static_cast<AbstractPart*>(thispart)));
+        XMLElement* taga = tagcircuit->FirstChildElement("a");
+        while (taga != nullptr) {
+            taga = taga->NextSiblingElement("a");
+            const char* aname = nullptr;
+            const char* aval = nullptr;
+            taga->QueryStringAttribute("name", &aname);
+            taga->QueryStringAttribute("val", &aval);
+            thispart->mapAbstractAttribute.insert(std::pair(std::string(aname), std::string(aval)));
+        }
+
+        XMLElement* tagcomp = tagcircuit->FirstChildElement("comp");
+        while (tagcomp != nullptr) {
+            tagcomp = tagcomp->NextSiblingElement("comp");
+            int libnum = -1;
+            const char* compname = nullptr;
+            const char* poschar = nullptr;
+            tagcircuit->QueryIntAttribute("lib", &libnum);
+            tagcircuit->QueryStringAttribute("loc", &poschar);
+            tagcircuit->QueryStringAttribute("name", &compname);
+
+            AbstractPart* ds = nullptr;
+
+            if(libnum == -1) { // THIS FILE
+                auto i = lib->mapAbstractPart.find(compname);
+                if(i != lib->mapAbstractPart.end()) {
+                    ds = i->second;
+                } else {
+                    ds = new AbstractPart();
+                    lib->mapAbstractPart.insert(std::pair<std::string, AbstractPart*>(std::string(compname), ds));
+                }
+            } else {
+                auto q = searchLibrary(libnumbernamemap.find(libnum)->second);
+                    // 무조건, UNDEFined Library 포인터라도 뱉는다.
+
+                auto i = q->mapAbstractPart.find(compname);
+                if(i != q->mapAbstractPart.end()) {
+                    ds = i->second;
+                } else {
+                    ds = new AbstractPart();
+                    q->mapAbstractPart.insert(std::pair<std::string, AbstractPart*>(std::string(compname), ds));
+                }
+            }
+
+
+
+            thispart->mapAbstractPart.insert(std::pair(Position::fromLoc(poschar), ds));
+        }
+
+        lib->mapAbstractPart.insert(std::pair(libsname, dynamic_cast<AbstractPart*>(thispart)));
     }
 
 
@@ -55,8 +107,12 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, Library* l
     return lib;
 }
 
-Library* LibraryManager::openZipLibrary(const std::string &filepath, Library* lib) { // "C:/Example.zip"
+Library* LibraryManager::openZipLibrary(const std::string &filepath, const std::string &name) { // "C:/Example.zip"
+    Library* lib = searchLibrary(name);
+
     if(lib == nullptr) lib = new Library();
+    else if(lib->type != eLibraryType::LibraryType_UNDEF) return lib;
+
     lib->type = LibraryType::LibraryType_Zip;
     return lib;
 }
