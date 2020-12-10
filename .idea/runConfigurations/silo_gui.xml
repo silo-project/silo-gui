@@ -1,7 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="silo-gui" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="file://../../src" PASS_PARENT_ENVS_2="true" PROJECT_NAME="silo-gui" TARGET_NAME="silo-gui" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="silo-gui" RUN_TARGET_NAME="silo-gui">
-    <method v="2">
-      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-    </method>
-  </configuration>
-</component>
