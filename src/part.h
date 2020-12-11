@@ -22,7 +22,8 @@ typedef unsigned int portID;
 typedef uint64_t position;
 
 namespace Position {
-    position fromLoc(const char * loc);
+    position fromLoc(const char* loc); // (A,B)
+    position fromPin(const char* pin); //  A,B
     uint32_t getX(position p);
     uint32_t getY(position p);
 }
