@@ -4,6 +4,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include "wirenet.h"
 
@@ -35,9 +36,15 @@ typedef enum ePartType {
 typedef class cAbstractPart {
 public:
     PartType type;
-    std::map<std::string, std::string> mapAbstractAttribute;
-    std::map<portID, WireNetID> mapWireNetID;
-    std::string draw = "";
+    std::vector<WireNetID> vectorWireNetID; // 자신 파츠 안에 WireNetID가 몇 번까지 부여되는가
+
+public:
+    std::map<std::string, std::string*> mapAbstractAttribute; // 자신이 부모 파츠에게 줄 기본 속성
+    std::map<std::string, std::string*> mapAttribute; // 부모 파츠가 본 자신의 속성
+    std::map<portID, WireNetID> mapWireNetID; // 부모 파츠에서 보면 자신의 어느 포트가 어디 물려 있는가, 여기서 WireNetID는 부모 파츠별로 0부터 새로 시작한다.
+    std::string draw = ""; // 임시
+
+public:
     void(* function)(NODE*) = nullptr; // Only for ComputePart
     std::map<position, cAbstractPart*> mapAbstractPart; // Only for CircPart
 } AbstractPart;

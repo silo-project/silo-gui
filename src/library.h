@@ -23,13 +23,17 @@ class cLibrary {
 public:
     LibraryType type = eLibraryType::LibraryType_UNDEF;
     std::filesystem::path path = "";
-    std::vector<&string> parents;
-    std::vector<&string> childs;
+    std::vector<std::string> parents;
+    std::vector<std::string> childs;
     std::map<std::string, AbstractPart*> mapAbstractPart;
     bool isReady();
 };
 
 typedef class LibraryManager {
+private:
+    static void connectWires(AbstractPart* thispart, std::map<WireNetID, WireNet*> &mapWireNetIDP,
+            std::map<WireID, position> &mapWireIDPosA, std::map<WireID, position> &mapWireIDPosB,
+            WireNetID nwwnetid, std::vector<position> &vectorPositionnowPropagate);
 protected:
     std::map<std::string, Library*> libraryMap;
 public:

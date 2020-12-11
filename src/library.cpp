@@ -4,12 +4,47 @@
 
 #include <string>
 #include <filesystem>
+#include <map>
+#include <vector>
 
 #include <tinyxml2.h>
 
 #include "library.h"
 
 using namespace tinyxml2;
+
+void LibraryManager::connectWires(AbstractPart* thispart, std::map<WireNetID, WireNet*> &mapWireNetIDP,
+        std::map<WireID, position> &mapWireIDPosA, std::map<WireID, position> &mapWireIDPosB,
+        WireNetID nwwnetid, std::vector<position> &vectorPositionnowPropagate) {
+    std::vector<position> vectorPositionnextPropagate;
+    for(auto t: vectorPositionnowPropagate) {
+        for(auto iA: mapWireIDPosA) {
+            auto wID = iA.first;
+            auto iB = mapWireIDPosB.find(wID);
+            if(iA.second == t) {
+                mapWireNetIDP.find(nwwnetid)->second->mapB.insert(std::pair<WireID, position>(wID, iB->second));
+                vectorPositionnextPropagate.push_back(iB->second);
+                mapWireIDPosA.erase(mapWireIDPosA.find(wID));
+                mapWireIDPosB.erase(iB);
+            } else if(iB->second == t) {
+                mapWireNetIDP.find(nwwnetid)->second->mapA.insert(std::pair<WireID, position>(wID, iA.second));
+                vectorPositionnextPropagate.push_back(iA.second);
+                mapWireIDPosA.erase(mapWireIDPosA.find(wID));
+                mapWireIDPosB.erase(iB);
+            }
+        }
+    }
+
+    if(vectorPositionnextPropagate.empty()) {
+        if(mapWireIDPosA.empty()) return;
+        else {
+            ++nwwnetid;
+            mapWireNetIDP.insert(std::pair<WireNetID, WireNet*>(nwwnetid, new WireNet()));
+        }
+    }
+
+    connectWires(thispart, mapWireNetIDP, mapWireIDPosA, mapWireIDPosB, nwwnetid, vectorPositionnowPropagate);
+}
 
 Library* LibraryManager::openCircLibrary(const std::string &filepath, const std::string &name) { // "C:/Example.circ"
     std::map<int, std::string> libnumbernamemap;
@@ -58,7 +93,47 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
             const char* aval = nullptr;
             taga->QueryStringAttribute("name", &aname);
             taga->QueryStringAttribute("val", &aval);
-            thispart->mapAbstractAttribute.insert(std::pair(std::string(aname), std::string(aval)));
+            thispart->mapAbstractAttribute.insert(std::pair<std::string, std::string*>(std::string(aname), new std::string(aval)));
+        }
+
+        std::map<WireID, position> mapWireIDPosF, mapWireIDPosT;
+
+        WireID dsa = 0;
+
+        XMLElement* tagwire = tagcircuit->FirstChildElement("wire");
+        while (tagwire != nullptr) {
+            tagwire = tagwire->NextSiblingElement("a");
+            const char* wf = nullptr;
+            const char* wt = nullptr;
+            taga->QueryStringAttribute("from", &wf);
+            taga->QueryStringAttribute("to",   &wt);
+            mapWireIDPosF.insert(std::pair<WireID, position>(dsa, Position::fromLoc(wf)));
+            mapWireIDPosT.insert(std::pair<WireID, position>(dsa, Position::fromLoc(wt)));
+            dsa++;
+        }
+
+        if(dsa > 0) {
+            std::map<WireID, position> mapWireIDPosA(mapWireIDPosF), mapWireIDPosB(mapWireIDPosT);
+
+            std::vector<position> vectorPositionnextPropagate;
+
+            auto iA = mapWireIDPosA.begin();
+            auto iID = iA->first;
+            vectorPositionnextPropagate.push_back(iA->second);
+            mapWireIDPosA.erase(iA);
+            auto iB = mapWireIDPosB.find(iID);
+            vectorPositionnextPropagate.push_back(iB->second);
+            mapWireIDPosB.erase(iB);
+
+            std::map<WireNetID, WireNet*> mapWireNetIDP;
+            mapWireNetIDP.insert(std::pair<WireNetID, WireNet *>(0, new WireNet()));
+            thispart->vectorWireNetID.push_back(0);
+
+            mapWireNetIDP.find(0)->second->mapA.insert(std::pair<WireID, position>(iID, iA->second));
+            mapWireNetIDP.find(0)->second->mapB.insert(std::pair<WireID, position>(iID, iB->second));
+
+            connectWires(thispart, mapWireNetIDP, mapWireIDPosA, mapWireIDPosB, 0, vectorPositionnextPropagate);
+
         }
 
         XMLElement* tagcomp = tagcircuit->FirstChildElement("comp");
@@ -67,9 +142,9 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
             int libnum = -1;
             const char* compname = nullptr;
             const char* poschar = nullptr;
-            tagcircuit->QueryIntAttribute("lib", &libnum);
-            tagcircuit->QueryStringAttribute("loc", &poschar);
-            tagcircuit->QueryStringAttribute("name", &compname);
+            tagcomp->QueryIntAttribute("lib", &libnum);
+            tagcomp->QueryStringAttribute("loc", &poschar);
+            tagcomp->QueryStringAttribute("name", &compname);
 
             AbstractPart* ds = nullptr;
 
@@ -94,6 +169,16 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
                 }
             }
 
+
+            XMLElement* tagda = tagcomp->FirstChildElement("a");
+            while (tagda != nullptr) {
+                tagda = tagda->NextSiblingElement("a");
+                const char* daname = nullptr;
+                const char* daval = nullptr;
+                taga->QueryStringAttribute("name", &daname);
+                taga->QueryStringAttribute("val", &daval);
+                ds->mapAttribute.insert(std::pair<std::string, std::string*>(std::string(daname), new std::string(daval)));
+            }
 
 
             thispart->mapAbstractPart.insert(std::pair(Position::fromLoc(poschar), ds));
@@ -129,6 +214,6 @@ void LibraryManager::putLibrary(const std::string &name, Library* lib) {
 bool cLibrary::isReady() {
     bool ready = this->type != eLibraryType::LibraryType_UNDEF;
     for(const auto& t : this->parents)
-        ready = ready & t->isReady();
+        ready = ready & t.isReady();
     return ready;
 }
