@@ -15,35 +15,34 @@ using namespace tinyxml2;
 
 void LibraryManager::connectWires(AbstractPart* thispart, std::map<WireNetID, WireNet*> &mapWireNetIDP,
         std::map<WireID, position> &mapWireIDPosA, std::map<WireID, position> &mapWireIDPosB,
-        WireNetID nwwnetid, std::vector<position> &vectorPositionnowPropagate) {
+        WireNetID nowWireNetID, std::vector<position> &vectorPositionnowPropagate) {
     std::vector<position> vectorPositionnextPropagate;
     for(auto t: vectorPositionnowPropagate) {
         for(auto iA: mapWireIDPosA) {
             auto wID = iA.first;
             auto iB = mapWireIDPosB.find(wID);
             if(iA.second == t) {
-                mapWireNetIDP.find(nwwnetid)->second->mapB.insert(std::pair<WireID, position>(wID, iB->second));
+                mapWireNetIDP.find(nowWireNetID)->second->mapB.insert(std::pair<WireID, position>(wID, iB->second));
                 vectorPositionnextPropagate.push_back(iB->second);
                 mapWireIDPosA.erase(mapWireIDPosA.find(wID));
                 mapWireIDPosB.erase(iB);
             } else if(iB->second == t) {
-                mapWireNetIDP.find(nwwnetid)->second->mapA.insert(std::pair<WireID, position>(wID, iA.second));
+                mapWireNetIDP.find(nowWireNetID)->second->mapA.insert(std::pair<WireID, position>(wID, iA.second));
                 vectorPositionnextPropagate.push_back(iA.second);
                 mapWireIDPosA.erase(mapWireIDPosA.find(wID));
                 mapWireIDPosB.erase(iB);
             }
         }
     }
-
     if(vectorPositionnextPropagate.empty()) {
         if(mapWireIDPosA.empty()) return;
         else {
-            ++nwwnetid;
-            mapWireNetIDP.insert(std::pair<WireNetID, WireNet*>(nwwnetid, new WireNet()));
+            ++nowWireNetID;
+            mapWireNetIDP.insert(std::pair<WireNetID, WireNet*>(nowWireNetID, new WireNet()));
         }
     }
 
-    connectWires(thispart, mapWireNetIDP, mapWireIDPosA, mapWireIDPosB, nwwnetid, vectorPositionnowPropagate);
+    connectWires(thispart, mapWireNetIDP, mapWireIDPosA, mapWireIDPosB, nowWireNetID, vectorPositionnowPropagate);
 }
 
 Library* LibraryManager::openCircLibrary(const std::string &filepath, const std::string &name) { // "C:/Example.circ"
@@ -133,7 +132,6 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
             mapWireNetIDP.find(0)->second->mapB.insert(std::pair<WireID, position>(iID, iB->second));
 
             connectWires(thispart, mapWireNetIDP, mapWireIDPosA, mapWireIDPosB, 0, vectorPositionnextPropagate);
-
         }
 
         XMLElement* tagcomp = tagcircuit->FirstChildElement("comp");
@@ -211,9 +209,11 @@ void LibraryManager::putLibrary(const std::string &name, Library* lib) {
     this->libraryMap.insert(std::pair<std::string, Library*>(name, lib));
 }
 
-bool cLibrary::isReady() {
-    bool ready = this->type != eLibraryType::LibraryType_UNDEF;
-    for(const auto& t : this->parents)
-        ready = ready & t.isReady();
-    return ready;
+bool cLibrary::isReady(LibraryManager &lm) {
+    if(this->type == eLibraryType::LibraryType_UNDEF) return false;
+    for(const auto& t: this->parents)
+        if(!lm.searchLibrary(t)->isReady(lm)) return false;
+    for(const auto& t: this->mapAbstractPart)
+        if(t.second->type == ePartType::PartType_UNDEF) return false;
+    return true;
 }

@@ -18,6 +18,7 @@ typedef enum eLibraryType {
 } LibraryType;
 
 typedef class cLibrary Library;
+typedef class cLibraryManager LibraryManager;
 
 class cLibrary {
 public:
@@ -26,10 +27,10 @@ public:
     std::vector<std::string> parents;
     std::vector<std::string> childs;
     std::map<std::string, AbstractPart*> mapAbstractPart;
-    bool isReady();
+    bool isReady(LibraryManager &lm);
 };
 
-typedef class LibraryManager {
+typedef class cLibraryManager {
 private:
     static void connectWires(AbstractPart* thispart, std::map<WireNetID, WireNet*> &mapWireNetIDP,
             std::map<WireID, position> &mapWireIDPosA, std::map<WireID, position> &mapWireIDPosB,
