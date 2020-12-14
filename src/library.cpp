@@ -3,7 +3,6 @@
 //
 
 #include <string>
-#include <filesystem>
 #include <map>
 #include <vector>
 
@@ -26,9 +25,24 @@ cLibraryManager::cLibraryManager() {
 
 void LibraryManager::connectWires(AbstractPart* thispart, std::map<WireNetID, WireNet*> &mapWireNetIDP,
         std::map<WireID, position> &mapWireIDPosA, std::map<WireID, position> &mapWireIDPosB,
+        std::map<std::string, std::vector<position>*> &mapLabelvectorPosition, WireID nowLabelID,
         WireNetID nowWireNetID, std::vector<position> &vectorPositionnowPropagate) {
     std::vector<position> vectorPositionnextPropagate;
     for(auto t: vectorPositionnowPropagate) {
+        for(const auto& iL: mapLabelvectorPosition) {
+            for(auto iP: *(iL.second)) {
+                if(iP == t) {
+                    for(auto itP: *(iL.second)) {
+                        vectorPositionnextPropagate.push_back(itP);
+                        mapWireNetIDP.find(nowWireNetID)->second->mapA.insert(std::pair<WireID, position>(nowLabelID, t));
+                        mapWireNetIDP.find(nowWireNetID)->second->mapB.insert(std::pair<WireID, position>(nowLabelID--, itP));
+                    }
+                    auto itL = mapLabelvectorPosition.find(iL.first);
+                    delete itL->second;
+                    mapLabelvectorPosition.erase(itL);
+                }
+            }
+        }
         for(auto iA: mapWireIDPosA) {
             auto wID = iA.first;
             auto iB = mapWireIDPosB.find(wID);
@@ -50,14 +64,15 @@ void LibraryManager::connectWires(AbstractPart* thispart, std::map<WireNetID, Wi
         else {
             ++nowWireNetID;
             mapWireNetIDP.insert(std::pair<WireNetID, WireNet*>(nowWireNetID, new WireNet()));
+            nowWireNetID = -1u;
         }
     }
 
-    connectWires(thispart, mapWireNetIDP, mapWireIDPosA, mapWireIDPosB, nowWireNetID, vectorPositionnowPropagate);
+    connectWires(thispart, mapWireNetIDP, mapWireIDPosA, mapWireIDPosB, mapLabelvectorPosition, nowLabelID, nowWireNetID, vectorPositionnowPropagate);
 }
 
 Library* LibraryManager::openCircLibrary(const std::string &filepath, const std::string &name) { // "C:/Example.circ"
-    std::map<int, std::string> libnumbernamemap;
+    std::map<int, std::string> mapLibIDName;
 
     Library* lib = searchLibrary(name);
 
@@ -86,7 +101,7 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
             libpointer->childs.push_back(name);
             int num = -1;
             taglib->QueryIntAttribute("name", &num);
-            libnumbernamemap.insert(std::pair(num, libsname));
+            mapLibIDName.insert(std::pair(num, libsname));
         }
     }
 
@@ -111,6 +126,8 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
             }
         }
 
+        std::map<std::string, std::vector<position>*> mapLabelvectorPosition;
+
         {
             XMLElement *tagcomp = tagcircuit->FirstChildElement("comp");
             while (tagcomp != nullptr) {
@@ -122,53 +139,62 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
                 tagcomp->QueryStringAttribute("loc", &poschar);
                 tagcomp->QueryStringAttribute("name", &compname);
 
-                {
-                    auto i = libnumbernamemap.find(libnum);
-                    if(i != libnumbernamemap.end()) {
-                        if(i->second.compare("#Wiring") == 0 & ) {
+                AbstractPart* ds = nullptr;
 
+                {
+                    if (libnum == -1) { // THIS FILE
+                        auto i = lib->mapAbstractPart.find(compname);
+                        if (i != lib->mapAbstractPart.end()) {
+                            ds = i->second;
+                        } else {
+                            ds = new AbstractPart();
+                            lib->mapAbstractPart.insert(
+                                    std::pair<std::string, AbstractPart *>(std::string(compname), ds));
+                        }
+                    } else {
+                        auto q = searchLibrary(mapLibIDName.find(libnum)->second);
+                        // 무조건, UNDEFined Library 포인터라도 뱉는다.
+
+                        auto i = q->mapAbstractPart.find(compname);
+                        if (i != q->mapAbstractPart.end()) {
+                            ds = i->second;
+                        } else {
+                            ds = new AbstractPart();
+                            q->mapAbstractPart.insert(
+                                    std::pair<std::string, AbstractPart *>(std::string(compname), ds));
                         }
                     }
                 }
 
-
-                AbstractPart *ds = nullptr;
-
-                if (libnum == -1) { // THIS FILE
-                    auto i = lib->mapAbstractPart.find(compname);
-                    if (i != lib->mapAbstractPart.end()) {
-                        ds = i->second;
-                    } else {
-                        ds = new AbstractPart();
-                        lib->mapAbstractPart.insert(std::pair<std::string, AbstractPart *>(std::string(compname), ds));
-                    }
-                } else {
-                    auto q = searchLibrary(libnumbernamemap.find(libnum)->second);
-                    // 무조건, UNDEFined Library 포인터라도 뱉는다.
-
-                    auto i = q->mapAbstractPart.find(compname);
-                    if (i != q->mapAbstractPart.end()) {
-                        ds = i->second;
-                    } else {
-                        ds = new AbstractPart();
-                        q->mapAbstractPart.insert(std::pair<std::string, AbstractPart *>(std::string(compname), ds));
+                {
+                    XMLElement *tagda = tagcomp->FirstChildElement("a");
+                    while (tagda != nullptr) {
+                        tagda = tagda->NextSiblingElement("a");
+                        const char *daname = nullptr;
+                        const char *daval = nullptr;
+                        tagda->QueryStringAttribute("name", &daname);
+                        tagda->QueryStringAttribute("val", &daval);
+                        ds->mapAttribute.insert(
+                                std::pair<std::string, std::string *>(std::string(daname), new std::string(daval)));
                     }
                 }
 
+                auto pos = Position::fromLoc(poschar);
 
-                XMLElement *tagda = tagcomp->FirstChildElement("a");
-                while (tagda != nullptr) {
-                    tagda = tagda->NextSiblingElement("a");
-                    const char *daname = nullptr;
-                    const char *daval = nullptr;
-                    taga->QueryStringAttribute("name", &daname);
-                    taga->QueryStringAttribute("val", &daval);
-                    ds->mapAttribute.insert(
-                            std::pair<std::string, std::string *>(std::string(daname), new std::string(daval)));
+                auto it = mapLibIDName.find(libnum);
+                if(strcmp(compname, "Tunnel") == 0 && it != mapLibIDName.end() && it->second == "#Wiring") {
+                    // TODO: Process Tunnel
+                    ds = searchLibrary("#Wiring")->mapAbstractPart.find("Tunnel")->second;
+                    auto label = *(ds->mapAttribute.find("label")->second);
+                    auto ip = mapLabelvectorPosition.find(label);
+                    if(ip == mapLabelvectorPosition.end()) {
+                        auto t = new std::vector<position>;
+                        t->push_back(pos);
+                        mapLabelvectorPosition.insert(std::pair<std::string, std::vector<position>*>(label, t));
+                    }
                 }
 
-
-                thispart->mapAbstractPart.insert(std::pair(Position::fromLoc(poschar), ds));
+                thispart->mapAbstractPart.insert(std::pair(pos, ds));
             }
         }
 
@@ -181,14 +207,14 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
                 tagwire = tagwire->NextSiblingElement("a");
                 const char *wf = nullptr;
                 const char *wt = nullptr;
-                taga->QueryStringAttribute("from", &wf);
-                taga->QueryStringAttribute("to", &wt);
+                tagwire->QueryStringAttribute("from", &wf);
+                tagwire->QueryStringAttribute("to", &wt);
                 mapWireIDPosF.insert(std::pair<WireID, position>(dsa, Position::fromLoc(wf)));
                 mapWireIDPosT.insert(std::pair<WireID, position>(dsa, Position::fromLoc(wt)));
                 dsa++;
             }
 
-            if (dsa > 0) {
+            if (dsa > 0 || !mapLabelvectorPosition.empty()) {
                 std::map<WireID, position> mapWireIDPosA(mapWireIDPosF), mapWireIDPosB(mapWireIDPosT);
 
                 std::vector<position> vectorPositionnextPropagate;
@@ -208,11 +234,13 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
                 mapWireNetIDP.find(0)->second->mapA.insert(std::pair<WireID, position>(iID, iA->second));
                 mapWireNetIDP.find(0)->second->mapB.insert(std::pair<WireID, position>(iID, iB->second));
 
-                connectWires(thispart, mapWireNetIDP, mapWireIDPosA, mapWireIDPosB, 0, vectorPositionnextPropagate);
+                connectWires(thispart, mapWireNetIDP, mapWireIDPosA, mapWireIDPosB, mapLabelvectorPosition, -1u, 0, vectorPositionnextPropagate);
             }
         }
 
         lib->mapAbstractPart.insert(std::pair(libsname, dynamic_cast<AbstractPart*>(thispart)));
+
+        for(const auto& t: mapLabelvectorPosition) delete t.second;
     }
 
 

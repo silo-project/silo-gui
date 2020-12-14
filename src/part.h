@@ -46,9 +46,11 @@ public:
     std::map<portID, WireNetID> mapWireNetID; // 부모 파츠에서 보면 자신의 어느 포트가 어디 물려 있는가, 여기서 WireNetID는 부모 파츠별로 0부터 새로 시작한다.
     std::string draw = ""; // 임시
 
-public:
-    void(* function)(NODE*) = nullptr; // Only for ComputePart
-    std::map<position, cAbstractPart*> mapAbstractPart; // Only for CircPart
+public: // Only for ComputePart
+    void(* function)(NODE*) = nullptr;
+
+public: // Only for CircPart
+    std::map<position, cAbstractPart*> mapAbstractPart;
 } AbstractPart;
 
 typedef class cAbstractComputePart : public AbstractPart {
