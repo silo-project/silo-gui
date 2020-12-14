@@ -42,6 +42,8 @@ public:
     Library* openZipLibrary(const std::string &filepath, const std::string &name);
     Library* searchLibrary(const std::string& name);
     void putLibrary(const std::string& name, Library* lib);
+
+    cLibraryManager();
 } LibraryManager;
 
 

@@ -31,7 +31,8 @@ namespace Position {
 typedef enum ePartType {
     PartType_UNDEF = 0,
     PartType_Circ = 1,
-    PartType_Zip
+    PartType_Zip,
+    PartType_Tunnel
 } PartType;
 
 typedef class cAbstractPart {
@@ -59,5 +60,10 @@ typedef class cAbstractCircPart : public AbstractPart {
 public:
     cAbstractCircPart();
 } AbstractCircPart;
+
+typedef class cAbstractTunnelPart : public AbstractPart {
+public:
+    cAbstractTunnelPart();
+} AbstractTunnelPart;
 
 #endif //SILO_GUI_PART_H

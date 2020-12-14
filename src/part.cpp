@@ -4,8 +4,9 @@
 
 #include "part.h"
 
-cAbstractCircPart::cAbstractCircPart()       { this->type = ePartType::PartType_Circ; }
-cAbstractComputePart::cAbstractComputePart() { this->type = ePartType::PartType_Zip;  }
+cAbstractCircPart::cAbstractCircPart()       { this->type = ePartType::PartType_Circ;   }
+cAbstractComputePart::cAbstractComputePart() { this->type = ePartType::PartType_Zip;    }
+cAbstractTunnelPart::cAbstractTunnelPart()   { this->type = ePartType::PartType_Tunnel; }
 
 position Position::fromLoc(const char* loc) {
     return (((uint64_t)atoi(loc + 1)) << 32u) | ((uint32_t)atoi(strchr(loc, ',') + 1));
