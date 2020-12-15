@@ -8,6 +8,8 @@
 
 #include <tinyxml2.h>
 
+#include <miniz.h>
+
 #include "library.h"
 
 using namespace tinyxml2;
@@ -23,10 +25,43 @@ cLibraryManager::cLibraryManager() {
     this->libraryMap.find("#Wiring")->second->mapAbstractPart.insert(std::pair<std::string, AbstractPart*>("Tunnel", new AbstractTunnelPart()));
 }
 
+// WireID
+// 0, 1, ...    : for "Wire"s
+// -1, -2, ...  : for "Tunnel"s
+
+static void unzip(std::string const &zipFile, std::string const &path) {
+    mz_zip_archive zip_archive;
+    memset(&zip_archive, 0, sizeof(zip_archive));
+
+    auto status = mz_zip_reader_init_file(&zip_archive, zipFile.c_str(), 0);
+    if (!status) return;
+    int fileCount = (int)mz_zip_reader_get_num_files(&zip_archive);
+    if (fileCount == 0) {
+        mz_zip_reader_end(&zip_archive);
+        return;
+    }
+    mz_zip_archive_file_stat file_stat;
+    if (!mz_zip_reader_file_stat(&zip_archive, 0, &file_stat)) {
+        mz_zip_reader_end(&zip_archive);
+        return;
+    }
+
+    for (int i = 0; i < fileCount; i++) {
+        if (!mz_zip_reader_file_stat(&zip_archive, i, &file_stat)) continue;
+        if (mz_zip_reader_is_file_a_directory(&zip_archive, i)) continue;
+
+
+        mz_zip_reader_extract_to_file(&zip_archive, i, destFile.c_str(), 0);
+    }
+
+    mz_zip_reader_end(&zip_archive);
+    return;
+}
+
 void LibraryManager::connectWires(AbstractPart* thispart, std::map<WireNetID, WireNet*> &mapWireNetIDP,
         std::map<WireID, position> &mapWireIDPosA, std::map<WireID, position> &mapWireIDPosB,
-        std::map<std::string, std::vector<position>*> &mapLabelvectorPosition, WireID nowLabelID,
-        WireNetID nowWireNetID, std::vector<position> &vectorPositionnowPropagate) {
+        std::map<std::string, std::vector<position>*> &mapLabelvectorPosition, WireID &nowLabelID,
+        WireNetID &nowWireNetID, std::vector<position> &vectorPositionnowPropagate) {
     std::vector<position> vectorPositionnextPropagate;
     for(auto t: vectorPositionnowPropagate) {
         for(const auto& iL: mapLabelvectorPosition) {
@@ -64,7 +99,7 @@ void LibraryManager::connectWires(AbstractPart* thispart, std::map<WireNetID, Wi
         else {
             ++nowWireNetID;
             mapWireNetIDP.insert(std::pair<WireNetID, WireNet*>(nowWireNetID, new WireNet()));
-            nowWireNetID = -1u;
+            nowLabelID = -1u;
         }
     }
 
@@ -182,15 +217,17 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
                 auto pos = Position::fromLoc(poschar);
 
                 auto it = mapLibIDName.find(libnum);
-                if(strcmp(compname, "Tunnel") == 0 && it != mapLibIDName.end() && it->second == "#Wiring") {
-                    // TODO: Process Tunnel
-                    ds = searchLibrary("#Wiring")->mapAbstractPart.find("Tunnel")->second;
-                    auto label = *(ds->mapAttribute.find("label")->second);
-                    auto ip = mapLabelvectorPosition.find(label);
-                    if(ip == mapLabelvectorPosition.end()) {
-                        auto t = new std::vector<position>;
-                        t->push_back(pos);
-                        mapLabelvectorPosition.insert(std::pair<std::string, std::vector<position>*>(label, t));
+                if(it != mapLibIDName.end() && it->second == "#Wiring") {
+                    if(strcmp(compname, "Tunnel") == 0) {
+                        // TODO: Process Tunnel
+                        ds = searchLibrary("#Wiring")->mapAbstractPart.find("Tunnel")->second;
+                        auto label = *(ds->mapAttribute.find("label")->second);
+                        auto ip = mapLabelvectorPosition.find(label);
+                        if (ip == mapLabelvectorPosition.end()) {
+                            auto t = new std::vector<position>;
+                            t->push_back(pos);
+                            mapLabelvectorPosition.insert(std::pair<std::string, std::vector<position> *>(label, t));
+                        }
                     }
                 }
 
@@ -234,7 +271,27 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
                 mapWireNetIDP.find(0)->second->mapA.insert(std::pair<WireID, position>(iID, iA->second));
                 mapWireNetIDP.find(0)->second->mapB.insert(std::pair<WireID, position>(iID, iB->second));
 
-                connectWires(thispart, mapWireNetIDP, mapWireIDPosA, mapWireIDPosB, mapLabelvectorPosition, -1u, 0, vectorPositionnextPropagate);
+                WireNetID nowWireNetID = 0;
+                WireID nowLabelID = -1u;
+
+                connectWires(thispart, mapWireNetIDP,
+                        mapWireIDPosA, mapWireIDPosB,
+                        mapLabelvectorPosition, nowLabelID,
+                        nowWireNetID, vectorPositionnextPropagate);
+
+                for(const auto& s: mapLabelvectorPosition) {
+                    ++nowWireNetID;
+                    WireID f = s.second->at(0);
+                    for(auto sr: *(s.second)) {
+                        if(sr == f) continue;
+                        mapWireNetIDP.find(nowWireNetID)->second->mapA.insert(std::pair<WireID, position>(nowLabelID, sr));
+                        mapWireNetIDP.find(nowWireNetID)->second->mapB.insert(std::pair<WireID, position>(nowLabelID--, f));
+                    }
+                    delete s.second;
+                    mapLabelvectorPosition.erase(mapLabelvectorPosition.find(s.first));
+                }
+
+
             }
         }
 
@@ -255,6 +312,7 @@ Library* LibraryManager::openZipLibrary(const std::string &filepath, const std::
     else if(lib->type != eLibraryType::LibraryType_UNDEF) return lib;
 
     lib->type = LibraryType::LibraryType_Zip;
+
     return lib;
 }
 

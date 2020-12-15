@@ -34,8 +34,8 @@ typedef class cLibraryManager {
 private:
     static void connectWires(AbstractPart* thispart, std::map<WireNetID, WireNet*> &mapWireNetIDP,
             std::map<WireID, position> &mapWireIDPosA, std::map<WireID, position> &mapWireIDPosB,
-            std::map<std::string, std::vector<position>*> &mapLabelvectorPosition, WireID nowLabelID,
-            WireNetID nwwnetid, std::vector<position> &vectorPositionnowPropagate);
+            std::map<std::string, std::vector<position>*> &mapLabelvectorPosition, WireID &nowLabelID,
+            WireNetID &nowWireNetID, std::vector<position> &vectorPositionnowPropagate);
 protected:
     std::map<std::string, Library*> libraryMap;
 public:

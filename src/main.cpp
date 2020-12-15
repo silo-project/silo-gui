@@ -3,7 +3,7 @@
 #include <Windows.h>
 #endif
 #include <httplib.h>
-#include <zlib.h>
+#include <miniz.h>
 
 #include <iostream>
 
