@@ -8,17 +8,19 @@ NODE * NodeCreate(void);
 노드를 생성하고 구조체의 주소값을 반환한다. 만약 생성에 실패하면 NULL 포인터를 반환한다.
 void NodeDelete(NODE *);
 노드 구조체를 삭제한다.
+NODE * NodeMakeCopy(NODE *);
+노드의 복제본을 만든다. 매개변수로 주어진 노드가 속한 시뮬레이터에 만들어진다.
 
-NODEID NodeGetID();
+NODEID NodeGetID(SIMU *);
 현재 사용 가능한 노드 번호를 얻는다. 다음 값은 자동으로 변한다.
 
-NODEID NodeGetNumber();
+NODEID NodeGetNumber(SIMU *);
 현재 노드의 숫자를 반환한다.
 
-NODEID NodeGetLastID();
+NODEID NodeGetLastID(SIMU *);
 마지막 노드의 번호를 반환한다.
 
-NODE * NodeGetPtr(NODEID nodeid);
+NODE * NodeGetPtr(SIMU *, NODEID nodeid);
 노드 번호를 이용하여 구조체의 주소를 얻는다.
 
 [Node_Type]
@@ -36,11 +38,16 @@ void NodeSetOupt(NODE * node, PORTID port, SENDFORM dest);
 노드 포인터 node의 포트 번호 port의 목적지를 전달 규격 dest로 설정한다.
 
 [Simulator]
-int SimuInit(void);
-시뮬레이터를 초기화한다.
+SIMU * SimuCreate(void);
+시뮬레이터를 생성한다. 시뮬레이터는 노드와는 다르게 번호로 관리되지 않으며 주소값으로만 관리한다.
+int SimuDelete(SIMU *);
+시뮬레이터를 제거한다. 만약 제거에 실패하면 1을 반환한다.
 
-int Simulate(void);
-실제로 시뮬레이션을 하는 함수. 내부적으로는 SimulateStep() 함수와 연결되어 있으며 한 스텝을 시뮬레이션 한다.
+void SimuTickMode(SIMU *);
+void SimuStepMode(SIMU *);
+
+int Simulate(SIMU *);
+시뮬레이션을 시작한다.
 
 void SendSignal (SENDFORM, SIGNAL);
 노드에 시그널을 보낼때 사용하는 함수.
@@ -48,14 +55,16 @@ void SendSignal (SENDFORM, SIGNAL);
 void Transfer(SENDFORM, SIGNAL);
 SendSignal() 함수와 비슷하지만 needmake 값을 true로 설정한다.
 
-void SimuResetSentlist(void);
+void SimuResetSentlist(SIMU *);
 sentlist의 목록을 초기화한다.
-
-void SimuListofNextExec(void);
+void SimuResetNextExec(SIMU *);
+void SimuListofSentList(SIMU *);
+void SimuListofNextExec(SIMU *);
 nextexec의 목록을 출력한다.
 
-int Thread_SetNumber(unsigned long long);
+
+int SimuThreadSetNum(SIMU *, unsigned long long);
 스레드 개수를 설정한다. 만약 현재 스레드 개수보다 적은 값이면 스레드를 취소시킨다.
 
-unsigned long long Thread_GetNumber(void);
+unsigned long long SimuThreadGetNum(SIMU *);
 현재의 스레드 개수를 반환한다.
