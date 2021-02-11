@@ -3,8 +3,8 @@ make/
 *.vcxproj*
 *.sln
 .vs/
-lib/
+lib/*/
 libcrypto*.dll
 libssl*.dll
 libtcc.dll
-!/lib/silo-main/
+!lib/silo-main/
