@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="silo-main" pattern="file[silo-gui]:lib/silo-main/*" />
+</component>
