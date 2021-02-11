@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 include(ExternalProject)
 
+ADD_COMPILE_OPTIONS(-O0)
+
 project(silo-gui CXX)
 
 set(CMAKE_VERBOSE_MAKEFILE true)

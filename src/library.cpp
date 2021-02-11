@@ -29,34 +29,6 @@ cLibraryManager::cLibraryManager() {
 // 0, 1, ...    : for "Wire"s
 // -1, -2, ...  : for "Tunnel"s
 
-static void unzip(std::string const &zipFile, std::string const &path) {
-    mz_zip_archive zip_archive;
-    memset(&zip_archive, 0, sizeof(zip_archive));
-
-    auto status = mz_zip_reader_init_file(&zip_archive, zipFile.c_str(), 0);
-    if (!status) return;
-    int fileCount = (int)mz_zip_reader_get_num_files(&zip_archive);
-    if (fileCount == 0) {
-        mz_zip_reader_end(&zip_archive);
-        return;
-    }
-    mz_zip_archive_file_stat file_stat;
-    if (!mz_zip_reader_file_stat(&zip_archive, 0, &file_stat)) {
-        mz_zip_reader_end(&zip_archive);
-        return;
-    }
-
-    for (int i = 0; i < fileCount; i++) {
-        if (!mz_zip_reader_file_stat(&zip_archive, i, &file_stat)) continue;
-        if (mz_zip_reader_is_file_a_directory(&zip_archive, i)) continue;
-
-
-        mz_zip_reader_extract_to_file(&zip_archive, i, destFile.c_str(), 0);
-    }
-
-    mz_zip_reader_end(&zip_archive);
-    return;
-}
 
 void LibraryManager::connectWires(AbstractPart* thispart, std::map<WireNetID, WireNet*> &mapWireNetIDP,
         std::map<WireID, position> &mapWireIDPosA, std::map<WireID, position> &mapWireIDPosB,

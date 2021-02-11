@@ -9,7 +9,11 @@
 
 #include "api/apis.h"
 
+#include "filesystem.h"
+
 int main(int argc, const char **argv) {
+    FileSystem::unzip("../", "");
+
     httplib::Server svr;
 
     svr.set_file_extension_and_mimetype_mapping("circ", "text/x-logisim");
