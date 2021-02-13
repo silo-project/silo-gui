@@ -49,7 +49,7 @@ SIMU * SimuCreate(void) {
 	s->simu.thread.status = 1;
 	
 	SimuStepMode(&s->simu.thread);
-	s->simu.thread.tickendhandler = NULL;
+	//atomic_init(&(s->simu.thread.tickendedthreads), 0);
 	
 	s->simu.attr = (pthread_attr_t *)malloc(sizeof(pthread_attr_t));
 	s->simu.cond = (pthread_cond_t  *)malloc(sizeof(pthread_cond_t));
@@ -316,7 +316,7 @@ static void * SimuThreadController(void * p) {
 }
 
 static void SimuThreadTickEndHandler(SIMU * s) {
-	
+
 }
 
 

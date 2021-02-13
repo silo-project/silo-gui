@@ -9,15 +9,15 @@ set(CMAKE_VERBOSE_MAKEFILE true)
 
 set(CMAKE_CXX_STANDARD 17)
 
-ExternalProject_Add(utility_silo-main
-        BUILD_IN_SOURCE true
-        GIT_REPOSITORY https://github.com/silo-project/silo-main.git
-        GIT_TAG origin/lib
-        SOURCE_DIR ${CMAKE_SOURCE_DIR}/lib/silo-main)
+#ExternalProject_Add(utility_silo-main
+#        BUILD_IN_SOURCE true
+#        GIT_REPOSITORY https://github.com/silo-project/silo-main.git
+#        GIT_TAG origin/lib
+#        SOURCE_DIR ${CMAKE_SOURCE_DIR}/lib/silo-main)
 
 # https://github.com/yhirose/cpp-httplib 0.7.15
 # https://github.com/leethomason/tinyxml2 8.0.0
-# https://github.com/richgel999/miniz/releases/tag/2.1.0
+# https://github.com/richgel999/miniz 2.1.0
 # http://download.savannah.gnu.org/releases/tinycc/ 0.9.27
 # Windows 라면 tcc win32 디렉터리에서 빌드 후 libtcc.dll 옮겨 놓을 것
 # xNIX라면 알아서 하고 여기 추가할 것

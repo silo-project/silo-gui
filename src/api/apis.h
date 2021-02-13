@@ -17,6 +17,11 @@ namespace api {
     namespace library {
 
     }
+    namespace session {
+        void open (const httplib::Request &req, httplib::Response &res);
+        void close(const httplib::Request &req, httplib::Response &res);
+        void act(const httplib::Request &req, httplib::Response &res, const httplib::ContentReader &content_reader);
+    }
 }
 
 #endif //SILO_GUI_APIS_H

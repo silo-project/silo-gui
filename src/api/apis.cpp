@@ -10,6 +10,9 @@ void registerapis(httplib::Server &svr) {
     svr.Post("/api/upload/logisimfile", api::upload::logisimfile);
     svr.Post("/api/upload/libraryfile", api::upload::libraryfile);
 
+    svr.Get("/api/session/open" , api::session::open );
+    svr.Get("/api/session/close", api::session::close);
+
     svr.Get("/api/library/list", [](const httplib::Request &, httplib::Response &res) {
         res.set_content("Hello World!", "text/plain");
     });

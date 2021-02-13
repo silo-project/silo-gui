@@ -10,7 +10,7 @@
 
 #include "../define.h"
 #include "../node/node.h"
-#include "signal.h"
+#include "../signal.h"
 #include "thread.h"
 
 typedef struct signalstruct SIGNAL;

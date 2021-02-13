@@ -1,6 +1,8 @@
 #ifndef SILO_THREAD_HEAD
 #define SILO_THREAD_HEAD
 
+#include "../define.h"
+
 #include <pthread.h>
 
 typedef struct nodestruct NODE;
@@ -32,7 +34,6 @@ struct SystemThread {
 	
 	NODE * clock;
 	DEFT_WORD clmax;
-    void *tickendhandler;
 };
 
 #endif
