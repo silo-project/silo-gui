@@ -2,17 +2,18 @@
 // Created by penta on 2020-11-24.
 //
 
+#include <fstream>
 #include <string>
 #include <map>
 #include <vector>
 
-#include <tinyxml2.h>
+#include <rapidxml.hpp>
 
 #include <miniz.h>
 
 #include "library.h"
 
-using namespace tinyxml2;
+using namespace rapidxml;
 
 cLibraryManager::cLibraryManager() {
     this->openZipLibrary("", "#Wiring");
@@ -87,17 +88,21 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
     else if(lib->type != eLibraryType::LibraryType_UNDEF) return lib;
 
     lib->type = LibraryType::LibraryType_Circ;
-    XMLDocument doc;
-    doc.LoadFile(filepath.c_str());
+    xml_document<> doc;
+    std::ifstream fp(filepath.c_str());
 
-    XMLElement* tagproject = doc.FirstChildElement("project");
+    std::vector<char> buffer((std::istreambuf_iterator<char>(fp)), std::istreambuf_iterator<char>( ));
+    buffer.push_back('\0');
+
+    doc.parse<0>(&buffer[0]);
+
+    xml_node<>* tagproject = doc.first_node("project");
 
     {
-        XMLElement *taglib = tagproject->FirstChildElement("lib");
+        xml_node<>* taglib = tagproject->first_node("lib");
         while (taglib != nullptr) {
-            taglib = taglib->NextSiblingElement("lib");
-            const char *libname = nullptr;
-            taglib->QueryStringAttribute("desc", &libname);
+            taglib = taglib->next_sibling("lib");
+            const char *libname = taglib->first_attribute("desc")->value();
             std::string libsname(libname);
             Library *libpointer = searchLibrary(libsname);
             if (libpointer == nullptr) {
@@ -106,28 +111,24 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
             }
             lib->parents.push_back(libsname);
             libpointer->childs.push_back(name);
-            int num = -1;
-            taglib->QueryIntAttribute("name", &num);
+            int num = atoi(taglib->first_attribute("name")->value());
             mapLibIDName.insert(std::pair(num, libsname));
         }
     }
 
-    XMLElement* tagcircuit = tagproject->FirstChildElement("circuit");
+    xml_node<>* tagcircuit = tagproject->first_node("circuit");
     while (tagcircuit != nullptr) {
-        tagcircuit = tagcircuit->NextSiblingElement("circuit");
-        const char * circuitname = nullptr;
-        tagcircuit->QueryStringAttribute("name", &circuitname);
+        tagcircuit = tagcircuit->next_sibling("circuit");
+        const char * circuitname = tagcircuit->first_attribute("name")->value();
         std::string libsname(circuitname);
         auto* thispart = new AbstractCircPart();
 
         {
-            XMLElement *taga = tagcircuit->FirstChildElement("a");
+            xml_node<>* taga = tagcircuit->first_node("a");
             while (taga != nullptr) {
-                taga = taga->NextSiblingElement("a");
-                const char *aname = nullptr;
-                const char *aval = nullptr;
-                taga->QueryStringAttribute("name", &aname);
-                taga->QueryStringAttribute("val", &aval);
+                taga = taga->next_sibling("a");
+                const char *aname = taga->first_attribute("name")->value();
+                const char *aval = taga->first_attribute("val")->value();
                 thispart->mapAbstractAttribute.insert(
                         std::pair<std::string, std::string *>(std::string(aname), new std::string(aval)));
             }
@@ -136,15 +137,12 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
         std::map<std::string, std::vector<position>*> mapLabelvectorPosition;
 
         {
-            XMLElement *tagcomp = tagcircuit->FirstChildElement("comp");
+            xml_node<>* tagcomp = tagcircuit->first_node("comp");
             while (tagcomp != nullptr) {
-                tagcomp = tagcomp->NextSiblingElement("comp");
-                int libnum = -1;
-                const char *compname = nullptr;
-                const char *poschar = nullptr;
-                tagcomp->QueryIntAttribute("lib", &libnum);
-                tagcomp->QueryStringAttribute("loc", &poschar);
-                tagcomp->QueryStringAttribute("name", &compname);
+                tagcomp = tagcomp->next_sibling("comp");
+                int libnum = atoi(tagcomp->first_attribute("lib")->value());
+                const char *compname = tagcomp->first_attribute("name")->value();
+                const char *poschar = tagcomp->first_attribute("loc")->value();
 
                 AbstractPart* ds = nullptr;
 
@@ -174,13 +172,11 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
                 }
 
                 {
-                    XMLElement *tagda = tagcomp->FirstChildElement("a");
+                    xml_node<>* tagda = tagcomp->first_node("a");
                     while (tagda != nullptr) {
-                        tagda = tagda->NextSiblingElement("a");
-                        const char *daname = nullptr;
-                        const char *daval = nullptr;
-                        tagda->QueryStringAttribute("name", &daname);
-                        tagda->QueryStringAttribute("val", &daval);
+                        tagda = tagda->next_sibling("a");
+                        const char *daname = tagda->first_attribute("name")->value();
+                        const char *daval = tagda->first_attribute("val")->value();
                         ds->mapAttribute.insert(
                                 std::pair<std::string, std::string *>(std::string(daname), new std::string(daval)));
                     }
@@ -211,13 +207,11 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
         WireID dsa = 0;
 
         {
-            XMLElement *tagwire = tagcircuit->FirstChildElement("wire");
+            xml_node<>* tagwire = tagcircuit->first_node("wire");
             while (tagwire != nullptr) {
-                tagwire = tagwire->NextSiblingElement("a");
-                const char *wf = nullptr;
-                const char *wt = nullptr;
-                tagwire->QueryStringAttribute("from", &wf);
-                tagwire->QueryStringAttribute("to", &wt);
+                tagwire = tagwire->next_sibling("a");
+                const char *wf = tagwire->first_attribute("from")->value();
+                const char *wt = tagwire->first_attribute("to")->value();
                 mapWireIDPosF.insert(std::pair<WireID, position>(dsa, Position::fromLoc(wf)));
                 mapWireIDPosT.insert(std::pair<WireID, position>(dsa, Position::fromLoc(wt)));
                 dsa++;
@@ -272,8 +266,7 @@ Library* LibraryManager::openCircLibrary(const std::string &filepath, const std:
         for(const auto& t: mapLabelvectorPosition) delete t.second;
     }
 
-
-    
+    fp.close();
     return lib;
 }
 

@@ -5,3 +5,5 @@ add_executable(silo-gui
         api/upload/logisimfile.cpp api/upload/libraryfile.cpp
         api/session.cpp
         filesystem.cpp filesystem.h)
+
+add_subdirectory(silo-main)
