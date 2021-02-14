@@ -5,6 +5,11 @@
 	Date: 2020-10-04 18:17 (YYYY-MM-DD)
 	Description: define node-structure, send-form
 */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef SILO_NODE_H
 #define SILO_NODE_H
 
@@ -79,4 +84,8 @@ NODEID NodeGetLastID(struct SystemNode *);
 NODE * NodeGetPtr(struct SystemNode *, NODEID);
 
 
+#endif
+
+#ifdef __cplusplus
+};
 #endif

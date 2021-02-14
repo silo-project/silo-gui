@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef SILO_THREAD_HEAD
 #define SILO_THREAD_HEAD
 
@@ -36,4 +40,8 @@ struct SystemThread {
 	DEFT_WORD clmax;
 };
 
+#endif
+
+#ifdef __cplusplus
+};
 #endif

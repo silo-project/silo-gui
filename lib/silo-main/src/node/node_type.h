@@ -5,6 +5,11 @@
 	Date: 09-10-20 16:56 (DD-MM-YY)
 	Description: configure node
 */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef SILO_NODECONF_H
 #define SILO_NODECONF_H
 
@@ -24,11 +29,8 @@ void NodeSetAttr(NODE * node, DEFT_WORD attr, DEFT_ADDR index);
 // storage is not able
 void NodeSetSend(NODE * node, PORTID port, struct silo_wire dest);
 
+#endif
 
-
-
-
-
-
-
+#ifdef __cplusplus
+};
 #endif

@@ -5,6 +5,11 @@
 	Date: 2020-12-28 09:00 (YYYY-MM-DD)
 	Description: define wire structrure
 */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef SILO_WIRE_H
 #define SILO_WIRE_H
 
@@ -13,8 +18,12 @@ typedef struct sendformat SENDFORM;
 typedef struct silo_wire WIRE;
 
 typedef struct silo_wire {
-	SENDFORM * send;
-	DEFT_WORD  size;
+    SENDFORM *send;
+    DEFT_WORD size;
 } WIRE;
 
+#endif
+
+#ifdef __cplusplus
+};
 #endif

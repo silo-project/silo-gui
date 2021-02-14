@@ -5,10 +5,19 @@
 	Date: 10-10-20 09:14
 	Description: basic SILO defines
 */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef SILO_DEFINE_HEAD
 #define SILO_DEFINE_HEAD
 
+#ifdef __cplusplus
+#include <cstdbool>
+#else
 #include <stdbool.h>
+#endif
 
 // default processing size
 #define SILO_WORD long long
@@ -24,4 +33,8 @@ typedef DEFT_ADDR SIMUID;
 
 #define BASICMEM 4096 // 4KiB = 1Page
 
+#endif
+
+#ifdef __cplusplus
+};
 #endif

@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef SILO_SIMULATE_IN_HEAD
 #define SILO_SIMULATE_IN_HEAD
 
@@ -11,4 +15,8 @@
 
 #define DEFT_SIM_MAXRES 500 // max response
 
+#endif
+
+#ifdef __cplusplus
+};
 #endif
